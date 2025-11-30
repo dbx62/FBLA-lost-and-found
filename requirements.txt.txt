@@ -1,0 +1,15 @@
+Flask==3.0.0gunicorn==21.2.0
+*(Note: We add `gunicorn` here because it is a professional web server. The default `python app.py` command is not stable enough for the cloud).*
+
+### Step 2: The Render Configuration
+When you connect your repository to Render, fill in these fields:
+
+* **Build Command:**
+    ```bash
+    pip install -r requirements.txt
+    ```
+    *(This tells Render: "Read that list I just made and install Flask and Gunicorn.")*
+
+* **Start Command:**
+    ```bash
+    gunicorn app:app
