@@ -1,34 +1,40 @@
 /* --- Variables & Reset --- */
 :root {
-    --primary: #2c3e50; /* Deep Blue/Grey */
-    --secondary: #3498db; /* Bright Blue */
-    --accent: #e74c3c; /* Red */
-    --light: #ecf0f1;
+    --primary: #c7470c;
+    --secondary: #25347a; 
+    --accent: #e74c3c; 
+    --light: #dc8861;
     --dark: #2c3e50;
-    --text-color: #333;
+    --text-color: black;
     --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 * {
     box-sizing: border-box;
     margin: 0;
-    padding: 0;
+    padding: 0; 
 }
 
 body {
     font-family: var(--font-main);
-    background-color: #f9f9f9;
     color: var(--text-color);
     line-height: 1.6;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    overflow-x: hidden; /* Prevent horizontal scroll when menu is off-screen */
+    overflow-x: hidden;
+
+    /* --- BACKGROUND LOGO SETUP --- */
+    background-image: linear-gradient(rgba(255, 255, 255, 0.90), rgba(255, 255, 255, 0.90)), url('seven_lakes_logo.png');
+    background-size: cover; 
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
 }
 
 /* --- Navigation --- */
 nav {
-    background-color: var(--primary);
+    background: linear-gradient(to right, #25347a, #3348a7ec);
     color: white;
     padding: 1rem 2rem;
     display: flex;
@@ -39,7 +45,8 @@ nav {
 }
 
 .logo {
-    font-size: 1.5rem;
+    font-family:'Gill Sans';
+    font-size: 1.7rem;
     font-weight: bold;
     text-decoration: none;
     color: white;
@@ -59,10 +66,10 @@ nav {
 }
 
 .nav-links a:hover {
-    color: var(--secondary);
+    color: white;
 }
 
-/* --- Mobile Menu Elements (Hidden by Default) --- */
+/* --- Mobile Menu Elements --- */
 .menu-toggle {
     display: none; /* Hidden on desktop */
     background: none;
@@ -172,6 +179,7 @@ main {
     max-width: 600px;
     margin: 0 auto;
     width: 100%;
+    border: 1px solid #ddd;
 }
 
 .form-group {
@@ -238,6 +246,9 @@ button.btn:hover, .btn:hover {
     overflow: hidden;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     transition: transform 0.2s;
+    /* Ensure content stacks nicely */
+    display: flex;
+    flex-direction: column;
 }
 
 .item-card:hover {
@@ -253,28 +264,75 @@ button.btn:hover, .btn:hover {
 
 .item-details {
     padding: 1rem;
+    /* Pushes the button to the bottom if content is short */
+    display: flex;
+    flex-direction: column;
+    flex: 1; 
 }
 
 .item-title {
     font-size: 1.2rem;
     margin-bottom: 0.5rem;
     color: var(--primary);
+    
+    /* Limits title to 2 lines, adds ellipsis (...) if too long */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.3;
+    height: 2.6em;
+    
+    /* Break long words if necessary */
+    word-break: break-word;
+    overflow-wrap: break-word;
 }
 
 .meta {
     font-size: 0.9rem;
     color: #666;
     margin-bottom: 10px;
+    
+    /* Force single line, ellipsis if too long */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+
+/* Push button to bottom of card */
+.item-details .btn {
+    margin-top: auto; 
 }
 
 /* --- Item Detail Page --- */
 .detail-container {
     background: white;
     padding: 2rem;
+    border: 2px solid black; /* Your custom black border */
     border-radius: 8px;
     display: flex;
     flex-wrap: wrap;
     gap: 2rem;
+    
+    /* Prevent overflow issues */
+    overflow: hidden;
+}
+
+/* Allow flex children to shrink below their content size if needed */
+.detail-container > div {
+    min-width: 0;
+}
+
+/* Force text wrapping on the detail page */
+.detail-container h1, 
+.detail-container p {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
+    max-width: 100%;
 }
 
 .detail-image {
@@ -290,17 +348,30 @@ button.btn:hover, .btn:hover {
     border-collapse: collapse;
     margin-top: 1rem;
     background: white;
+    /* Enforce fixed layout so cells respect widths */
+    table-layout: fixed; 
 }
 
 .admin-table th, .admin-table td {
     padding: 12px;
     border-bottom: 1px solid #eee;
     text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .admin-table th {
-    background-color: var(--primary);
+    background-color: #203386;
     color: white;
+}
+
+/* Ensure the 'Actions' column (last column) is visible/flexible */
+.admin-table th:last-child, 
+.admin-table td:last-child {
+    width: 180px; /* Give actions enough space */
+    white-space: normal;
+    overflow: visible;
 }
 
 /* --- Footer --- */
@@ -336,6 +407,9 @@ footer {
     border-radius: 8px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.2);
     animation: slideDown 0.3s ease-out;
+    
+    /* Prevent modal from getting too wide with long text */
+    overflow: hidden;
 }
 
 @keyframes slideDown {
@@ -354,10 +428,23 @@ footer {
     align-items: center;
 }
 
+.modal-header h2 {
+    overflow-wrap: break-word;
+    word-break: break-word;
+    margin-right: 10px;
+}
+
 .modal-body {
     padding: 20px;
     max-height: 70vh;
     overflow-y: auto;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
+}
+
+#modalDesc {
+    white-space: pre-wrap; 
 }
 
 .close-modal {
@@ -365,6 +452,8 @@ footer {
     font-size: 28px;
     font-weight: bold;
     cursor: pointer;
+    min-width: 30px; /* Ensure click target doesn't shrink */
+    text-align: right;
 }
 
 .close-modal:hover {
@@ -412,10 +501,18 @@ footer {
         padding: 1rem;
     }
 
+    /* On mobile, reset table layout so horizontal scroll works */
     .admin-table {
         display: block;
         overflow-x: auto;
         white-space: nowrap;
+        table-layout: auto; 
+    }
+    
+    .admin-table th, .admin-table td {
+        white-space: nowrap; /* Keep rows on one line for scrolling */
+        max-width: none; /* Allow full width since we scroll */
+        overflow: visible;
     }
     
     .form-container {
@@ -430,4 +527,4 @@ footer {
         width: 95%;
         margin: 10% auto;
     }
-}
+}   
