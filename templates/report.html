@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="form-container">
+    <h2>Report a Found Item</h2>
+    <p style="margin-bottom: 1rem; color: #666;">Thank you for your honesty. Please fill out the details below.</p>
+    
+    <form method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="title">Item Name</label>
+            <input type="text" id="title" name="title" required placeholder="e.g., Red Water Bottle">
+        </div>
+
+        <div class="form-group">
+            <label for="description">Detailed Description</label>
+            <textarea id="description" name="description" rows="4" required placeholder="Brand, scratches, contents..."></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="location">Location Found</label>
+            <input type="text" id="location" name="location" required placeholder="e.g., Cafeteria Table 4">
+        </div>
+
+        <div class="form-group">
+            <label for="date_found">Date Found</label>
+            <input type="date" id="date_found" name="date_found" required>
+        </div>
+
+        <div class="form-group">
+            <label for="contact_info">Your Full Name & ID Number (Private)</label>
+            <p style="font-size:0.8rem; color:#666; margin-bottom:5px;">This is only seen by the Admin so we can record who found the item.</p>
+            <input type="text" id="contact_info" name="contact_info" required placeholder="e.g., Jane Doe - 12345678">
+        </div>
+
+        <div class="form-group">
+            <label for="image">Upload Photo (Optional)</label>
+            <input type="file" id="image" name="image" accept="image/*">
+        </div>
+
+        <button type="submit" class="btn">Submit Report</button>
+    </form>
+</div>
+{% endblock %}

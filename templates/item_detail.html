@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<a href="{{ url_for('items') }}" style="display: inline-block; margin-bottom: 1rem;">&larr; Back to Listings</a>
+
+<div class="detail-container">
+    <div style="flex: 1; min-width: 300px;">
+        {% if item.image_file %}
+            <img src="{{ url_for('static', filename='uploads/' + item.image_file) }}" alt="{{ item.title }}" class="detail-image">
+        {% else %}
+            <div style="width: 100%; height: 300px; background: #eee; display: flex; align-items: center; justify-content: center;">No Image Available</div>
+        {% endif %}
+    </div>
+    
+    <div style="flex: 1; min-width: 300px;">
+        <h1 style="color: var(--primary);">{{ item.title }}</h1>
+        <p style="margin-top: 0.5rem; font-style: italic; color: #666;">Reported on {{ item.date_found }}</p>
+        
+        <div style="margin: 2rem 0;">
+            <h3>Description</h3>
+            <p>{{ item.description }}</p>
+        </div>
+
+        <div style="margin: 2rem 0;">
+            <h3>Location Found</h3>
+            <p>{{ item.location }}</p>
+        </div>
+
+        <!-- Claim Form Section -->
+        <div style="background: #f1f8ff; padding: 1.5rem; border-radius: 8px; border: 1px solid #c8e1ff;">
+            <h3>Is this yours?</h3>
+            <p style="margin-bottom: 1rem; font-size: 0.9rem;">Submit a claim request below. The Admin will review your proof and contact you directly.</p>
+            
+            <form method="post">
+                <div class="form-group">
+                    <label for="claimer_name">Your Name</label>
+                    <input type="text" name="claimer_name" required style="width:100%; padding:8px; margin-bottom:10px;">
+                </div>
+                
+                <div class="form-group">
+                    <label for="claimer_contact">Your Contact (Email/Phone)</label>
+                    <input type="text" name="claimer_contact" required style="width:100%; padding:8px; margin-bottom:10px;">
+                </div>
+
+                <div class="form-group">
+                    <label for="proof_description">Proof of Ownership</label>
+                    <textarea name="proof_description" rows="3" required placeholder="Describe something not visible in the photo (e.g., 'There is a sticker on the bottom')..." style="width:100%; padding:8px; margin-bottom:10px;"></textarea>
+                </div>
+
+                <button type="submit" class="btn">Send Claim Request</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="text-align: center; padding: 3rem 0;">
+    <h1>Welcome to the Campus Lost & Found</h1>
+    <p style="margin: 1rem 0 2rem 0; font-size: 1.1rem;">
+        Did you lose something? Or did you find something that isn't yours?<br>
+        We help reunite students with their belongings.
+    </p>
+    <div>
+        <a href="{{ url_for('report') }}" class="btn">I Found Something</a>
+        <a href="{{ url_for('items') }}" class="btn" style="background-color: #2c3e50; margin-left: 10px;">I Lost Something</a>
+    </div>
+</div>
+
+<h2>Recently Found Items</h2>
+<div class="item-grid">
+    {% for item in items %}
+    <div class="item-card">
+        {% if item.image_file %}
+            <img src="{{ url_for('static', filename='uploads/' + item.image_file) }}" alt="{{ item.title }}" class="item-image">
+        {% else %}
+            <div class="item-image" style="display:flex;align-items:center;justify-content:center;color:#888;">No Photo</div>
+        {% endif %}
+        <div class="item-details">
+            <h3 class="item-title">{{ item.title }}</h3>
+            <p class="meta">Found at: {{ item.location }}</p>
+            <p class="meta">Date: {{ item.date_found }}</p>
+            <a href="{{ url_for('item_detail', id=item.id) }}" class="btn" style="padding: 5px 10px; font-size: 0.9rem;">View Details</a>
+        </div>
+    </div>
+    {% else %}
+        <p>No recently found items reported.</p>
+    {% endfor %}
+</div>
+{% endblock %}

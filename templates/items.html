@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h2>Browse Found Items</h2>
+    <form action="{{ url_for('items') }}" method="get" style="display: flex; gap: 10px;">
+        <input type="text" name="q" placeholder="Search items..." value="{{ query }}">
+        <button type="submit" class="btn">Search</button>
+    </form>
+</div>
+
+{% if query %}
+    <p>Showing results for: "<strong>{{ query }}</strong>"</p>
+{% endif %}
+
+<div class="item-grid">
+    {% for item in items %}
+    <div class="item-card">
+        {% if item.image_file %}
+            <img src="{{ url_for('static', filename='uploads/' + item.image_file) }}" alt="{{ item.title }}" class="item-image">
+        {% else %}
+            <div class="item-image" style="display:flex;align-items:center;justify-content:center;color:#888;">No Photo</div>
+        {% endif %}
+        <div class="item-details">
+            <h3 class="item-title">{{ item.title }}</h3>
+            <p class="meta"><strong>Found:</strong> {{ item.location }}</p>
+            <p class="meta"><strong>Date:</strong> {{ item.date_found }}</p>
+            <a href="{{ url_for('item_detail', id=item.id) }}" class="btn" style="width: 100%; text-align: center; margin-top: 10px;">Is this yours?</a>
+        </div>
+    </div>
+    {% else %}
+        <p>No items found matching your criteria.</p>
+    {% endfor %}
+</div>
+{% endblock %}
