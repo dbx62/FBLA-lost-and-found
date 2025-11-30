@@ -9,7 +9,9 @@
 <body>
     <nav>
         <a href="{{ url_for('index') }}" class="logo">Lost & Found</a>
-        <ul class="nav-links">
+        
+        <!-- Desktop Navigation (Hidden on Mobile) -->
+        <ul class="nav-links desktop-nav">
             <li><a href="{{ url_for('index') }}">Home</a></li>
             <li><a href="{{ url_for('report') }}">Report Item</a></li>
             <li><a href="{{ url_for('items') }}">Browse Items</a></li>
@@ -20,7 +22,30 @@
                 <li><a href="{{ url_for('login') }}">Login</a></li>
             {% endif %}
         </ul>
+
+        <!-- Mobile Hamburger Button (Visible only on Mobile) -->
+        <button class="menu-toggle" onclick="toggleMenu()">&#9776;</button>
     </nav>
+
+    <!-- Mobile Side Menu Drawer -->
+    <div class="side-menu" id="sideMenu">
+        <div class="side-menu-header">
+            <h3>Menu</h3>
+            <button class="close-btn" onclick="toggleMenu()">&times;</button>
+        </div>
+        <a href="{{ url_for('index') }}">Home</a>
+        <a href="{{ url_for('report') }}">Report Item</a>
+        <a href="{{ url_for('items') }}">Browse Items</a>
+        {% if session.get('user_id') %}
+            <a href="{{ url_for('dashboard') }}">Admin Dashboard</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        {% else %}
+            <a href="{{ url_for('login') }}">Login</a>
+        {% endif %}
+    </div>
+
+    <!-- Dark Overlay (Click to close) -->
+    <div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
 
     <main>
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -39,5 +64,22 @@
     <footer>
         <p>&copy; 2024 School Lost & Found System</p>
     </footer>
+
+    <!-- Menu Toggle Script -->
+    <script>
+        function toggleMenu() {
+            var menu = document.getElementById('sideMenu');
+            var overlay = document.getElementById('menuOverlay');
+            
+            // Toggle the 'active' class on both elements
+            if (menu.classList.contains('active')) {
+                menu.classList.remove('active');
+                overlay.classList.remove('active');
+            } else {
+                menu.classList.add('active');
+                overlay.classList.add('active');
+            }
+        }
+    </script>
 </body>
 </html>
