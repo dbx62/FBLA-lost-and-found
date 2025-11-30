@@ -61,8 +61,14 @@
         {% block content %}{% endblock %}
     </main>
 
+    <!-- UPDATED FOOTER -->
     <footer>
         <p>&copy; 2025 Seven Lakes High School Lost & Found System</p>
+        <div class="footer-links">
+            <a href="{{ url_for('contact') }}">Contact Us</a>
+            <span class="separator">|</span>
+            <a href="{{ url_for('legal') }}">Legal & Privacy</a>
+        </div>
     </footer>
 
     <!-- Menu Toggle Script -->

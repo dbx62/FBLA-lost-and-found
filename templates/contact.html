@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="form-container">
+    <h2>Contact Us</h2>
+    <p style="margin-bottom: 2rem; color: #666;">
+        Have questions about the Lost & Found system? Need to schedule a pickup outside of normal hours? 
+        Reach out to the administration office.
+    </p>
+
+    <div style="margin-bottom: 2rem;">
+        <h3 style="color: var(--primary); margin-bottom: 10px;">Main Office</h3>
+        <p><strong>Location:</strong> Building A, Room 101</p>
+        <p><strong>Hours:</strong> Mon-Fri, 8:00 AM - 4:00 PM</p>
+        <p><strong>Phone:</strong> (555) 123-4567</p>
+        <p><strong>Email:</strong> admin@school.edu</p>
+    </div>
+
+    <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; border-left: 4px solid var(--secondary);">
+        <h3>For Item Claims</h3>
+        <p>
+            Please use the <a href="{{ url_for('items') }}" style="color: var(--secondary); font-weight: bold;">Browse Items</a> page 
+            to find your specific item and submit a claim request directly through that item's page. 
+            This ensures we can track your claim efficiently.
+        </p>
+    </div>
+</div>
+{% endblock %}

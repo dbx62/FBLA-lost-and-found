@@ -228,6 +228,15 @@ def delete_claim(id):
     flash('Claim request dismissed.', 'success')
     return redirect(url_for('dashboard'))
 
+# --- NEW ROUTES ---
+@app.route('/contact')
+def contact():
+    return render_template('contact.html')
+
+@app.route('/legal')
+def legal():
+    return render_template('legal.html')
+
 if __name__ == '__main__':
     if not os.path.exists(DATABASE):
         init_db()

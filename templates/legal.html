@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="form-container" style="max-width: 800px;">
+    <h1>Legal & Privacy Information</h1>
+    <p style="color: #666; margin-bottom: 2rem;">Last Updated: November 2024</p>
+
+    <section style="margin-bottom: 2rem;">
+        <h3 style="color: var(--primary);">1. Terms of Use</h3>
+        <p>
+            This website is provided as a service to the student body to facilitate the return of lost property. 
+            By using this site, you agree to submit accurate information regarding found items and honest claims regarding lost items.
+            False reports or fraudulent claims may result in disciplinary action.
+        </p>
+    </section>
+
+    <section style="margin-bottom: 2rem;">
+        <h3 style="color: var(--primary);">2. Privacy Policy</h3>
+        <p>
+            We take student privacy seriously.
+        </p>
+        <ul style="margin-left: 20px; margin-top: 10px;">
+            <li><strong>Finder Information:</strong> The name and ID number of students reporting found items are stored securely in our database. This information is accessible <strong>only</strong> to authorized administrators and is never displayed publicly.</li>
+            <li><strong>Claimant Information:</strong> Information submitted during a claim (Name, Contact Info) is used solely for the purpose of verifying ownership and coordinating the return of the item.</li>
+            <li><strong>Cookies:</strong> This site uses a minimal session cookie to maintain administrator login states. No tracking cookies are used.</li>
+        </ul>
+    </section>
+
+    <section style="margin-bottom: 2rem;">
+        <h3 style="color: var(--primary);">3. Item Retention Policy</h3>
+        <p>
+            Found items reported on this system will be held in the Main Office for a period of <strong>60 days</strong> from the date of submission.
+            Unclaimed items after this period may be donated to charity or disposed of, in accordance with school district policy.
+        </p>
+    </section>
+</div>
+{% endblock %}

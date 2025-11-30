@@ -4,7 +4,7 @@
 <a href="{{ url_for('items') }}" style="display: inline-block; margin-bottom: 1rem;">&larr; Back to Listings</a>
 
 <div class="detail-container">
-    <div style="flex: 1; min-width: 300px;">
+    <div style="flex: 1; min-width: 300px; ">
         {% if item.image_file %}
             <img src="{{ url_for('static', filename='uploads/' + item.image_file) }}" alt="{{ item.title }}" class="detail-image">
         {% else %}
@@ -27,7 +27,7 @@
         </div>
 
         <!-- Claim Form Section -->
-        <div style="background: #f1f8ff; padding: 1.5rem; border-radius: 8px; border: 1px solid #c8e1ff;">
+        <div style="background: #f1f8ff; padding: 1.5rem; border-radius: 8px; border: 2px solid black;">
             <h3>Is this yours?</h3>
             <p style="margin-bottom: 1rem; font-size: 0.9rem;">Submit a claim request below. The Admin will review your proof and contact you directly.</p>
             

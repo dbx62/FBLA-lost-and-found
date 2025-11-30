@@ -9,6 +9,36 @@
     --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+/* --- Footer (UPDATED) --- */
+footer {
+    text-align: center;
+    padding: 2rem 1rem;
+    background-color: var(--dark);
+    color: white;
+    margin-top: auto;
+}
+
+.footer-links {
+    margin-top: 10px;
+    font-size: 0.9rem;
+}
+
+.footer-links a {
+    color: var(--light);
+    text-decoration: none;
+    margin: 0 8px;
+    transition: color 0.3s;
+}
+
+.footer-links a:hover {
+    color: white;
+    text-decoration: underline;
+}
+
+.separator {
+    color: rgba(255,255,255,0.3);
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -527,4 +557,4 @@ footer {
         width: 95%;
         margin: 10% auto;
     }
-}   
+}
