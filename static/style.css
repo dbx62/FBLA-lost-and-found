@@ -4,39 +4,10 @@
     --secondary: #25347a; 
     --accent: #e74c3c; 
     --light: #dc8861;
-    --dark: #2c3e50;
+    --dark: #25347a; /* Updated to Blue per your request */
     --text-color: black;
     --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-/* --- Footer (UPDATED) --- */
-footer {
-    text-align: center;
-    padding: 2rem 1rem;
-    background-color: var(--dark);
-    color: white;
-    margin-top: auto;
-}
-
-.footer-links {
-    margin-top: 10px;
-    font-size: 0.9rem;
-}
-
-.footer-links a {
-    color: var(--light);
-    text-decoration: none;
-    margin: 0 8px;
-    transition: color 0.3s;
-}
-
-.footer-links a:hover {
-    color: white;
-    text-decoration: underline;
-}
-
-.separator {
-    color: rgba(255,255,255,0.3);
+    --font-title: 'Georgia', 'Times New Roman', Times, serif; 
 }
 
 * {
@@ -64,6 +35,7 @@ body {
 
 /* --- Navigation --- */
 nav {
+    /* Updated Gradient */
     background: linear-gradient(to right, #25347a, #3348a7ec);
     color: white;
     padding: 1rem 2rem;
@@ -75,7 +47,8 @@ nav {
 }
 
 .logo {
-    font-family:'Gill Sans';
+    /* Updated Font & Size */
+    font-family: 'Times New Roman', Times, serif;
     font-size: 1.7rem;
     font-weight: bold;
     text-decoration: none;
@@ -130,7 +103,8 @@ nav {
 }
 
 .side-menu-header {
-    background-color: #1a252f;
+    /* Updated Background Color */
+    background-color: #dc8861;
     padding: 1rem;
     display: flex;
     justify-content: space-between;
@@ -276,7 +250,6 @@ button.btn:hover, .btn:hover {
     overflow: hidden;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     transition: transform 0.2s;
-    /* Ensure content stacks nicely */
     display: flex;
     flex-direction: column;
 }
@@ -294,7 +267,6 @@ button.btn:hover, .btn:hover {
 
 .item-details {
     padding: 1rem;
-    /* Pushes the button to the bottom if content is short */
     display: flex;
     flex-direction: column;
     flex: 1; 
@@ -332,7 +304,6 @@ button.btn:hover, .btn:hover {
     display: block;
 }
 
-/* Push button to bottom of card */
 .item-details .btn {
     margin-top: auto; 
 }
@@ -341,22 +312,19 @@ button.btn:hover, .btn:hover {
 .detail-container {
     background: white;
     padding: 2rem;
-    border: 2px solid black; /* Your custom black border */
+    /* Updated to specific black border */
+    border: 2px solid black; 
     border-radius: 8px;
     display: flex;
     flex-wrap: wrap;
     gap: 2rem;
-    
-    /* Prevent overflow issues */
     overflow: hidden;
 }
 
-/* Allow flex children to shrink below their content size if needed */
 .detail-container > div {
     min-width: 0;
 }
 
-/* Force text wrapping on the detail page */
 .detail-container h1, 
 .detail-container p {
     overflow-wrap: break-word;
@@ -378,7 +346,6 @@ button.btn:hover, .btn:hover {
     border-collapse: collapse;
     margin-top: 1rem;
     background: white;
-    /* Enforce fixed layout so cells respect widths */
     table-layout: fixed; 
 }
 
@@ -392,14 +359,14 @@ button.btn:hover, .btn:hover {
 }
 
 .admin-table th {
+    /* Updated Background Color */
     background-color: #203386;
     color: white;
 }
 
-/* Ensure the 'Actions' column (last column) is visible/flexible */
 .admin-table th:last-child, 
 .admin-table td:last-child {
-    width: 180px; /* Give actions enough space */
+    width: 180px; 
     white-space: normal;
     overflow: visible;
 }
@@ -407,10 +374,31 @@ button.btn:hover, .btn:hover {
 /* --- Footer --- */
 footer {
     text-align: center;
-    padding: 1rem;
+    padding: 2rem 1rem;
     background-color: var(--dark);
     color: white;
     margin-top: auto;
+}
+
+.footer-links {
+    margin-top: 10px;
+    font-size: 0.9rem;
+}
+
+.footer-links a {
+    color: var(--light);
+    text-decoration: none;
+    margin: 0 8px;
+    transition: color 0.3s;
+}
+
+.footer-links a:hover {
+    color: white;
+    text-decoration: underline;
+}
+
+.separator {
+    color: rgba(255,255,255,0.3);
 }
 
 /* --- Modal (Popup) Styles --- */
@@ -437,8 +425,6 @@ footer {
     border-radius: 8px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.2);
     animation: slideDown 0.3s ease-out;
-    
-    /* Prevent modal from getting too wide with long text */
     overflow: hidden;
 }
 
@@ -482,7 +468,7 @@ footer {
     font-size: 28px;
     font-weight: bold;
     cursor: pointer;
-    min-width: 30px; /* Ensure click target doesn't shrink */
+    min-width: 30px; 
     text-align: right;
 }
 
@@ -510,15 +496,36 @@ footer {
     display: block;
 }
 
+/* --- BROWSE HEADER & SEARCH --- */
+.browse-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    position: relative; 
+    min-height: 50px; 
+}
+
+/* Desktop Defaults */
+.search-form {
+    display: flex;
+    gap: 10px;
+}
+
+.mobile-search-toggle,
+.mobile-search-close {
+    display: none; 
+}
+
 /* --- MOBILE RESPONSIVENESS FIXES --- */
 @media screen and (max-width: 768px) {
     /* 1. Toggle Visibility */
     .desktop-nav {
-        display: none; /* Hide standard nav links */
+        display: none; 
     }
     
     .menu-toggle {
-        display: block; /* Show hamburger button */
+        display: block; 
     }
 
     /* 2. Grid & Layout Fixes */
@@ -531,7 +538,6 @@ footer {
         padding: 1rem;
     }
 
-    /* On mobile, reset table layout so horizontal scroll works */
     .admin-table {
         display: block;
         overflow-x: auto;
@@ -540,8 +546,8 @@ footer {
     }
     
     .admin-table th, .admin-table td {
-        white-space: nowrap; /* Keep rows on one line for scrolling */
-        max-width: none; /* Allow full width since we scroll */
+        white-space: nowrap;
+        max-width: none; 
         overflow: visible;
     }
     
@@ -556,5 +562,60 @@ footer {
     .modal-content {
         width: 95%;
         margin: 10% auto;
+    }
+
+    /* 3. MOBILE SEARCH BAR LOGIC */
+    .browse-header {
+        position: relative;
+    }
+
+    /* Hide the form by default on mobile */
+    .search-form {
+        display: none; 
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background-color: #f9f9f9; 
+        padding: 5px;
+        z-index: 50;
+        gap: 5px;
+        align-items: center;
+    }
+
+    /* Show toggle button by default */
+    .mobile-search-toggle {
+        display: block;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 5px;
+        color: var(--primary);
+    }
+
+    /* When form is active (via JS toggle) */
+    .search-form.active {
+        display: flex; 
+        justify-content: space-between;
+    }
+    
+    .browse-header.search-active .mobile-search-toggle {
+        display: none;
+    }
+
+    /* Show the 'X' close button inside the form */
+    .mobile-search-close {
+        display: block;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #666;
+        padding: 0 10px;
+    }
+    
+    .search-form input {
+        flex-grow: 1;
     }
 }

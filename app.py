@@ -7,10 +7,16 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__)
 app.secret_key = 'dev_key_change_this_for_production'
 
-# Configuration
-UPLOAD_FOLDER = 'static/uploads'
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
-DATABASE = 'database.db'
+# --- CONFIGURATION ---
+# Get the absolute path of the directory where app.py is located
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static/uploads')
+
+# UPDATED: Added 'webp' and 'avif' to allowed extensions
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'avif'}
+
+DATABASE = os.path.join(BASE_DIR, 'database.db')
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -33,7 +39,7 @@ def close_connection(exception):
 def init_db():
     with app.app_context():
         db = get_db()
-        # Items Table (Stores finder info securely)
+        # Items Table
         db.execute('''
             CREATE TABLE IF NOT EXISTS items (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -46,7 +52,7 @@ def init_db():
                 status TEXT DEFAULT 'pending' 
             )
         ''')
-        # Users Table (Admin)
+        # Users Table
         db.execute('''
             CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -54,7 +60,7 @@ def init_db():
                 password TEXT NOT NULL
             )
         ''')
-        # NEW: Claims Table (Stores claimant info)
+        # Claims Table
         db.execute('''
             CREATE TABLE IF NOT EXISTS claims (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -96,7 +102,6 @@ def report():
         description = request.form['description']
         location = request.form['location']
         date_found = request.form['date_found']
-        # This is the FINDER'S contact info (Hidden from public)
         contact_info = request.form['contact_info']
         
         filename = None
@@ -145,7 +150,6 @@ def item_detail(id):
         return redirect(url_for('items'))
 
     if request.method == 'POST':
-        # The user is claiming the item
         claimer_name = request.form['claimer_name']
         claimer_contact = request.form['claimer_contact']
         proof_description = request.form['proof_description']
@@ -158,6 +162,15 @@ def item_detail(id):
         return redirect(url_for('item_detail', id=id))
 
     return render_template('item_detail.html', item=item)
+
+# --- Static Pages (Contact & Legal) ---
+@app.route('/contact')
+def contact():
+    return render_template('contact.html')
+
+@app.route('/legal')
+def legal():
+    return render_template('legal.html')
 
 # --- Admin Routes ---
 
@@ -191,7 +204,6 @@ def dashboard():
     db = get_db()
     pending = db.execute('SELECT * FROM items WHERE status = "pending"').fetchall()
     approved = db.execute('SELECT * FROM items WHERE status = "approved"').fetchall()
-    # Fetch all claims to show the admin
     claims = db.execute('SELECT * FROM claims ORDER BY id DESC').fetchall()
     
     return render_template('dashboard.html', pending=pending, approved=approved, claims=claims)
@@ -211,7 +223,6 @@ def delete(id):
     if 'user_id' not in session:
         return redirect(url_for('login'))
     db = get_db()
-    # Delete item AND any associated claims
     db.execute('DELETE FROM items WHERE id = ?', (id,))
     db.execute('DELETE FROM claims WHERE item_id = ?', (id,))
     db.commit()
@@ -228,16 +239,7 @@ def delete_claim(id):
     flash('Claim request dismissed.', 'success')
     return redirect(url_for('dashboard'))
 
-# --- NEW ROUTES ---
-@app.route('/contact')
-def contact():
-    return render_template('contact.html')
-
-@app.route('/legal')
-def legal():
-    return render_template('legal.html')
-
 if __name__ == '__main__':
     if not os.path.exists(DATABASE):
         init_db()
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0') 

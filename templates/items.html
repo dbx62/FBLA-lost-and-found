@@ -1,12 +1,23 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-    <h2>Browse Found Items</h2>
-    <form action="{{ url_for('items') }}" method="get" style="display: flex; gap: 10px;">
-        <input type="text" name="q" placeholder="Search items..." value="{{ query }}">
-        <button type="submit" class="btn">Search</button>
-    </form>
+<div class="browse-header">
+    <h2 class="page-title">Browse Found Items</h2>
+    
+    <div class="search-container">
+        <!-- Mobile Toggle Button (Visible only on small screens) -->
+        <button class="mobile-search-toggle" onclick="toggleSearch()" aria-label="Open Search">
+            &#128269; <!-- Magnifying Glass Icon -->
+        </button>
+
+        <!-- Search Form -->
+        <form action="{{ url_for('items') }}" method="get" class="search-form" id="searchForm">
+            <input type="text" name="q" placeholder="Search items..." value="{{ query }}">
+            <button type="submit" class="btn">Search</button>
+            <!-- Close Button (Visible only on mobile when search is open) -->
+            <button type="button" class="mobile-search-close" onclick="toggleSearch()">&times;</button>
+        </form>
+    </div>
 </div>
 
 {% if query %}
@@ -32,4 +43,15 @@
         <p>No items found matching your criteria.</p>
     {% endfor %}
 </div>
+
+<script>
+    function toggleSearch() {
+        var form = document.getElementById('searchForm');
+        var container = document.querySelector('.browse-header');
+        
+        // Toggle the active class to show/hide the form
+        form.classList.toggle('active');
+        container.classList.toggle('search-active');
+    }
+</script>
 {% endblock %}
