@@ -5,29 +5,27 @@ from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
+# Secret key for session management
 app.secret_key = 'dev_key_change_this_for_production'
 
-# --- CONFIGURATION ---
-# Get the absolute path of the directory where app.py is located
+# --- Configuration ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
 UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static/uploads')
-
-# UPDATED: Added 'webp' and 'avif' to allowed extensions
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'avif'}
-
 DATABASE = os.path.join(BASE_DIR, 'database.db')
+
+# Allowed extensions for image uploads
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'avif'}
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# --- Database Helper Functions ---
+# --- Database Connection ---
 
 def get_db():
     db = getattr(g, '_database', None)
     if db is None:
         db = g._database = sqlite3.connect(DATABASE)
-        db.row_factory = sqlite3.Row
+        db.row_factory = sqlite3.Row  # Access columns by name
     return db
 
 @app.teardown_appcontext
@@ -37,9 +35,11 @@ def close_connection(exception):
         db.close()
 
 def init_db():
+    """Initializes the database with required tables and default admin."""
     with app.app_context():
         db = get_db()
-        # Items Table
+        
+        # Items table
         db.execute('''
             CREATE TABLE IF NOT EXISTS items (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -52,7 +52,8 @@ def init_db():
                 status TEXT DEFAULT 'pending' 
             )
         ''')
-        # Users Table
+        
+        # Users table
         db.execute('''
             CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -60,7 +61,8 @@ def init_db():
                 password TEXT NOT NULL
             )
         ''')
-        # Claims Table
+        
+        # Claims table
         db.execute('''
             CREATE TABLE IF NOT EXISTS claims (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -73,25 +75,26 @@ def init_db():
             )
         ''')
         
-        # Create default admin if not exists
+        # Create default admin account if none exists
         cur = db.execute('SELECT * FROM users WHERE username = ?', ('admin',))
         if cur.fetchone() is None:
             hashed_pw = generate_password_hash('admin123')
             db.execute('INSERT INTO users (username, password) VALUES (?, ?)', ('admin', hashed_pw))
             db.commit()
-            print("Default admin created.")
+            print("Default admin account created.")
 
-# --- Helper Logic ---
+# --- Utilities ---
 
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# --- Routes ---
+# --- Public Routes ---
 
 @app.route('/')
 def index():
     db = get_db()
+    # Fetch recent approved items for the homepage
     items = db.execute('SELECT * FROM items WHERE status = "approved" ORDER BY id DESC LIMIT 3').fetchall()
     return render_template('index.html', items=items)
 
@@ -104,11 +107,13 @@ def report():
         date_found = request.form['date_found']
         contact_info = request.form['contact_info']
         
+        # Handle image upload
         filename = None
         if 'image' in request.files:
             file = request.files['image']
             if file and allowed_file(file.filename):
                 filename = secure_filename(file.filename)
+                # Ensure unique filename
                 import uuid
                 filename = f"{uuid.uuid4().hex}_{filename}"
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
@@ -119,7 +124,7 @@ def report():
             (title, description, location, date_found, contact_info, filename)
         )
         db.commit()
-        flash('Item reported! An admin will review it shortly.', 'success')
+        flash('Item reported successfully. Pending admin approval.', 'success')
         return redirect(url_for('index'))
 
     return render_template('report.html')
@@ -149,6 +154,7 @@ def item_detail(id):
         flash('Item not found.', 'error')
         return redirect(url_for('items'))
 
+    # Handle claim submission
     if request.method == 'POST':
         claimer_name = request.form['claimer_name']
         claimer_contact = request.form['claimer_contact']
@@ -158,12 +164,13 @@ def item_detail(id):
                    (id, item['title'], claimer_name, claimer_contact, proof_description))
         db.commit()
         
-        flash(f"Claim sent! The Admin will review your proof and contact you at {claimer_contact}.", 'success')
+        flash(f"Claim request submitted. An admin will contact you at {claimer_contact}.", 'success')
         return redirect(url_for('item_detail', id=id))
 
     return render_template('item_detail.html', item=item)
 
-# --- Static Pages (Contact & Legal) ---
+# --- Static Pages ---
+
 @app.route('/contact')
 def contact():
     return render_template('contact.html')
@@ -183,7 +190,7 @@ def login():
         user = db.execute('SELECT * FROM users WHERE username = ?', (username,)).fetchone()
 
         if user is None or not check_password_hash(user['password'], password):
-            flash('Incorrect username or password.', 'error')
+            flash('Invalid credentials.', 'error')
         else:
             session.clear()
             session['user_id'] = user['id']
@@ -223,10 +230,11 @@ def delete(id):
     if 'user_id' not in session:
         return redirect(url_for('login'))
     db = get_db()
+    # Delete item and associated claims
     db.execute('DELETE FROM items WHERE id = ?', (id,))
     db.execute('DELETE FROM claims WHERE item_id = ?', (id,))
     db.commit()
-    flash('Item and associated claims removed.', 'success')
+    flash('Item removed.', 'success')
     return redirect(url_for('dashboard'))
 
 @app.route('/delete_claim/<int:id>')
@@ -236,10 +244,10 @@ def delete_claim(id):
     db = get_db()
     db.execute('DELETE FROM claims WHERE id = ?', (id,))
     db.commit()
-    flash('Claim request dismissed.', 'success')
+    flash('Claim dismissed.', 'success')
     return redirect(url_for('dashboard'))
 
 if __name__ == '__main__':
     if not os.path.exists(DATABASE):
         init_db()
-    app.run(debug=True, host='0.0.0.0') 
+    app.run(debug=True, host='0.0.0.0')

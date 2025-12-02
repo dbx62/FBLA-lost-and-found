@@ -10,7 +10,7 @@
     <nav>
         <a href="{{ url_for('index') }}" class="logo">SLHS Lost & Found</a>
         
-        <!-- Desktop Navigation (Hidden on Mobile) -->
+        <!-- Desktop Navigation -->
         <ul class="nav-links desktop-nav">
             <li><a href="{{ url_for('index') }}">Home</a></li>
             <li><a href="{{ url_for('report') }}">Report Item</a></li>
@@ -23,11 +23,11 @@
             {% endif %}
         </ul>
 
-        <!-- Mobile Hamburger Button (Visible only on Mobile) -->
+        <!-- Mobile Menu Toggle -->
         <button class="menu-toggle" onclick="toggleMenu()">&#9776;</button>
     </nav>
 
-    <!-- Mobile Side Menu Drawer -->
+    <!-- Side Menu Drawer -->
     <div class="side-menu" id="sideMenu">
         <div class="side-menu-header">
             <h3>Menu</h3>
@@ -44,10 +44,11 @@
         {% endif %}
     </div>
 
-    <!-- Dark Overlay (Click to close) -->
+    <!-- Menu Overlay -->
     <div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
 
     <main>
+        <!-- Flash Messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 <ul class="flash-messages">
@@ -61,7 +62,7 @@
         {% block content %}{% endblock %}
     </main>
 
-    <!-- UPDATED FOOTER -->
+    <!-- Footer -->
     <footer>
         <p>&copy; 2025 Seven Lakes High School Lost & Found System</p>
         <div class="footer-links">
@@ -71,13 +72,12 @@
         </div>
     </footer>
 
-    <!-- Menu Toggle Script -->
+    <!-- Scripts -->
     <script>
         function toggleMenu() {
             var menu = document.getElementById('sideMenu');
             var overlay = document.getElementById('menuOverlay');
             
-            // Toggle the 'active' class on both elements
             if (menu.classList.contains('active')) {
                 menu.classList.remove('active');
                 overlay.classList.remove('active');

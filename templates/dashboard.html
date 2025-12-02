@@ -3,7 +3,7 @@
 {% block content %}
 <h1>Admin Dashboard</h1>
 
-<!-- SECTION 1: CLAIMS (High Priority) -->
+<!-- Active Claims Section -->
 <div style="margin-top: 2rem; background: #fff3cd; padding: 15px; border-radius: 8px; border: 1px solid #ffeeba;">
     <h2 style="color: #856404;">Active Claim Requests</h2>
     <p style="font-size: 0.9rem; margin-bottom: 10px;">
@@ -44,7 +44,7 @@
     {% endif %}
 </div>
 
-<!-- SECTION 2: PENDING APPROVALS -->
+<!-- Pending Items Section -->
 <div style="margin-top: 3rem;">
     <h2 style="color: var(--accent);">Pending Item Approvals</h2>
     {% if pending %}
@@ -67,7 +67,6 @@
                 <td style="color: var(--accent); font-weight: bold;">{{ item.contact_info }}</td>
                 <td>{{ item.description[:50] }}...</td>
                 <td>
-                    <!-- Added Preview Button with Data Attributes -->
                     <button class="btn btn-preview" style="padding: 5px 10px; font-size: 0.8rem;"
                             data-title="{{ item.title }}"
                             data-desc="{{ item.description }}"
@@ -91,7 +90,7 @@
     {% endif %}
 </div>
 
-<!-- SECTION 3: APPROVED ITEMS -->
+<!-- Live Items Section -->
 <div style="margin-top: 3rem;">
     <h2>Live Items</h2>
     <table class="admin-table">
@@ -112,7 +111,6 @@
                 <td style="color: #666;">{{ item.contact_info }}</td>
                 <td><span style="background: #d4edda; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem;">Live</span></td>
                 <td>
-                    <!-- Added Preview Button here too -->
                     <button class="btn btn-preview" style="padding: 7px 10px; font-size: 0.8rem;"
                             data-title="{{ item.title }}"
                             data-desc="{{ item.description }}"
@@ -131,7 +129,7 @@
     </table>
 </div>
 
-<!-- PREVIEW MODAL STRUCTURE -->
+<!-- Preview Modal -->
 <div id="previewModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -163,7 +161,6 @@
     </div>
 </div>
 
-<!-- MODAL JAVASCRIPT -->
 <script>
     var modal = document.getElementById("previewModal");
     var modalImg = document.getElementById("modalImg");
@@ -174,7 +171,7 @@
     var modalContact = document.getElementById("modalContact");
 
     function openPreview(btn) {
-        // Get data from attributes
+        // Retrieve data attributes
         var title = btn.getAttribute('data-title');
         var desc = btn.getAttribute('data-desc');
         var loc = btn.getAttribute('data-location');
@@ -182,14 +179,14 @@
         var contact = btn.getAttribute('data-contact');
         var imgFile = btn.getAttribute('data-img');
 
-        // Populate Modal
+        // Populate modal fields
         modalTitle.innerText = title;
         modalDesc.innerText = desc;
         modalLoc.innerText = loc;
         modalDate.innerText = date;
         modalContact.innerText = contact;
 
-        // Handle Image
+        // Show image if exists
         if (imgFile && imgFile !== 'None' && imgFile !== '') {
             modalImg.src = "/static/uploads/" + imgFile;
             modalImg.style.display = "block";
@@ -197,7 +194,6 @@
             modalImg.style.display = "none";
         }
 
-        // Show Modal
         modal.style.display = "block";
     }
 
@@ -205,7 +201,7 @@
         modal.style.display = "none";
     }
 
-    // Close if clicked outside
+    // Close modal on outside click
     window.onclick = function(event) {
         if (event.target == modal) {
             modal.style.display = "none";

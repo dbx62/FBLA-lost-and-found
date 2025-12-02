@@ -4,7 +4,7 @@
     --secondary: #25347a; 
     --accent: #e74c3c; 
     --light: #dc8861;
-    --dark: #25347a; /* Updated to Blue per your request */
+    --dark: #25347a; 
     --text-color: black;
     --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     --font-title: 'Georgia', 'Times New Roman', Times, serif; 
@@ -25,7 +25,7 @@ body {
     min-height: 100vh;
     overflow-x: hidden;
 
-    /* --- BACKGROUND LOGO SETUP --- */
+    /* Background with overlay */
     background-image: linear-gradient(rgba(255, 255, 255, 0.90), rgba(255, 255, 255, 0.90)), url('seven_lakes_logo.png');
     background-size: cover; 
     background-position: center;
@@ -35,7 +35,6 @@ body {
 
 /* --- Navigation --- */
 nav {
-    /* Updated Gradient */
     background: linear-gradient(to right, #25347a, #3348a7ec);
     color: white;
     padding: 1rem 2rem;
@@ -47,7 +46,6 @@ nav {
 }
 
 .logo {
-    /* Updated Font & Size */
     font-family: 'Times New Roman', Times, serif;
     font-size: 1.7rem;
     font-weight: bold;
@@ -72,9 +70,9 @@ nav {
     color: white;
 }
 
-/* --- Mobile Menu Elements --- */
+/* --- Mobile Menu --- */
 .menu-toggle {
-    display: none; /* Hidden on desktop */
+    display: none; 
     background: none;
     border: none;
     color: white;
@@ -91,7 +89,7 @@ nav {
     background-color: var(--dark);
     box-shadow: -2px 0 5px rgba(0,0,0,0.5);
     z-index: 1000;
-    transform: translateX(100%); /* Hide off-screen to the right */
+    transform: translateX(100%); 
     transition: transform 0.3s ease-in-out;
     padding-top: 0;
     display: flex;
@@ -99,11 +97,10 @@ nav {
 }
 
 .side-menu.active {
-    transform: translateX(0); /* Slide in */
+    transform: translateX(0); 
 }
 
 .side-menu-header {
-    /* Updated Background Color */
     background-color: #dc8861;
     padding: 1rem;
     display: flex;
@@ -135,7 +132,7 @@ nav {
     color: white;
 }
 
-/* Dark Overlay */
+/* Overlay for mobile menu */
 .menu-overlay {
     position: fixed;
     top: 0;
@@ -152,13 +149,13 @@ nav {
     display: block;
 }
 
-/* --- Layout --- */
+/* --- Main Layout --- */
 main {
     max-width: 1200px;
     margin: 2rem auto;
     padding: 0 1rem;
     width: 100%;
-    flex: 1; /* Pushes footer down */
+    flex: 1; 
 }
 
 /* --- Flash Messages --- */
@@ -272,12 +269,11 @@ button.btn:hover, .btn:hover {
     flex: 1; 
 }
 
+/* Handle overflow for long titles */
 .item-title {
     font-size: 1.2rem;
     margin-bottom: 0.5rem;
     color: var(--primary);
-    
-    /* Limits title to 2 lines, adds ellipsis (...) if too long */
     display: -webkit-box;
     -webkit-line-clamp: 2;
     line-clamp: 2;
@@ -286,8 +282,6 @@ button.btn:hover, .btn:hover {
     text-overflow: ellipsis;
     line-height: 1.3;
     height: 2.6em;
-    
-    /* Break long words if necessary */
     word-break: break-word;
     overflow-wrap: break-word;
 }
@@ -296,8 +290,6 @@ button.btn:hover, .btn:hover {
     font-size: 0.9rem;
     color: #666;
     margin-bottom: 10px;
-    
-    /* Force single line, ellipsis if too long */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -312,7 +304,6 @@ button.btn:hover, .btn:hover {
 .detail-container {
     background: white;
     padding: 2rem;
-    /* Updated to specific black border */
     border: 2px solid black; 
     border-radius: 8px;
     display: flex;
@@ -359,7 +350,6 @@ button.btn:hover, .btn:hover {
 }
 
 .admin-table th {
-    /* Updated Background Color */
     background-color: #203386;
     color: white;
 }
@@ -401,7 +391,7 @@ footer {
     color: rgba(255,255,255,0.3);
 }
 
-/* --- Modal (Popup) Styles --- */
+/* --- Modal (Popup) --- */
 .modal {
     display: none;
     position: fixed; 
@@ -496,7 +486,7 @@ footer {
     display: block;
 }
 
-/* --- BROWSE HEADER & SEARCH --- */
+/* --- Browse Page & Search --- */
 .browse-header {
     display: flex;
     justify-content: space-between;
@@ -506,7 +496,6 @@ footer {
     min-height: 50px; 
 }
 
-/* Desktop Defaults */
 .search-form {
     display: flex;
     gap: 10px;
@@ -517,9 +506,9 @@ footer {
     display: none; 
 }
 
-/* --- MOBILE RESPONSIVENESS FIXES --- */
+/* --- Mobile Responsiveness --- */
 @media screen and (max-width: 768px) {
-    /* 1. Toggle Visibility */
+    /* Hide desktop nav, show mobile toggle */
     .desktop-nav {
         display: none; 
     }
@@ -528,7 +517,7 @@ footer {
         display: block; 
     }
 
-    /* 2. Grid & Layout Fixes */
+    /* Single column layout */
     .item-grid {
         grid-template-columns: 1fr;
     }
@@ -538,6 +527,7 @@ footer {
         padding: 1rem;
     }
 
+    /* Table scrolling */
     .admin-table {
         display: block;
         overflow-x: auto;
@@ -564,12 +554,11 @@ footer {
         margin: 10% auto;
     }
 
-    /* 3. MOBILE SEARCH BAR LOGIC */
+    /* Mobile Search Bar Logic */
     .browse-header {
         position: relative;
     }
 
-    /* Hide the form by default on mobile */
     .search-form {
         display: none; 
         position: absolute;
@@ -583,7 +572,6 @@ footer {
         align-items: center;
     }
 
-    /* Show toggle button by default */
     .mobile-search-toggle {
         display: block;
         background: none;
@@ -594,7 +582,6 @@ footer {
         color: var(--primary);
     }
 
-    /* When form is active (via JS toggle) */
     .search-form.active {
         display: flex; 
         justify-content: space-between;
@@ -604,7 +591,6 @@ footer {
         display: none;
     }
 
-    /* Show the 'X' close button inside the form */
     .mobile-search-close {
         display: block;
         background: none;
