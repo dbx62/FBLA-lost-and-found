@@ -8,18 +8,18 @@
 </head>
 <body>
     <nav>
-        <a href="{{ url_for('index') }}" class="logo">SLHS Lost & Found</a>
+        <a href="{{ url_for('index') }}" class="logo">𝒮𝐿𝐻𝒮 𝐿𝑜𝓈𝓉 𝒶𝓃𝒹 𝐹𝑜𝓊𝓃𝒹</a>
         
         <!-- Desktop Navigation -->
         <ul class="nav-links desktop-nav">
-            <li><a href="{{ url_for('index') }}">Home</a></li>
-            <li><a href="{{ url_for('report') }}">Report Item</a></li>
-            <li><a href="{{ url_for('items') }}">Browse Items</a></li>
+            <li><a href="{{ url_for('index') }}">𝐇𝐨𝐦𝐞</a></li>
+            <li><a href="{{ url_for('report') }}">𝐑𝐞𝐩𝐨𝐫𝐭 𝐈𝐭𝐞𝐦</a></li>
+            <li><a href="{{ url_for('items') }}">𝐁𝐫𝐨𝐰𝐬𝐞 𝐈𝐭𝐞𝐦𝐬</a></li>
             {% if session.get('user_id') %}
-                <li><a href="{{ url_for('dashboard') }}">Admin Dashboard</a></li>
-                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                <li><a href="{{ url_for('dashboard') }}">𝐀𝐝𝐦𝐢𝐧 𝐃𝐚𝐬𝐡𝐛𝐨𝐚𝐫𝐝</a></li>
+                <li><a href="{{ url_for('logout') }}">𝐋𝐨𝐠𝐨𝐮𝐭</a></li>
             {% else %}
-                <li><a href="{{ url_for('login') }}">Login</a></li>
+                <li><a href="{{ url_for('login') }}">𝐋𝐨𝐠𝐢𝐧</a></li>
             {% endif %}
         </ul>
 
@@ -30,17 +30,17 @@
     <!-- Side Menu Drawer -->
     <div class="side-menu" id="sideMenu">
         <div class="side-menu-header">
-            <h3>Menu</h3>
+            <h2>𝗠𝗲𝗻𝘂</h2>
             <button class="close-btn" onclick="toggleMenu()">&times;</button>
         </div>
-        <a href="{{ url_for('index') }}">Home</a>
-        <a href="{{ url_for('report') }}">Report Item</a>
-        <a href="{{ url_for('items') }}">Browse Items</a>
+        <a href="{{ url_for('index') }}">𝐇𝐨𝐦𝐞</a>
+        <a href="{{ url_for('report') }}">𝐑𝐞𝐩𝐨𝐫𝐭 𝐈𝐭𝐞𝐦</a>
+        <a href="{{ url_for('items') }}">𝐁𝐫𝐨𝐰𝐬𝐞 𝐈𝐭𝐞𝐦𝐬</a>
         {% if session.get('user_id') %}
-            <a href="{{ url_for('dashboard') }}">Admin Dashboard</a>
-            <a href="{{ url_for('logout') }}">Logout</a>
+            <a href="{{ url_for('dashboard') }}">𝐀𝐝𝐦𝐢𝐧 𝐃𝐚𝐬𝐡𝐛𝐨𝐚𝐫𝐝</a>
+            <a href="{{ url_for('logout') }}">𝐋𝐨𝐠𝐨𝐮𝐭</a>
         {% else %}
-            <a href="{{ url_for('login') }}">Login</a>
+            <a href="{{ url_for('login') }}">𝐋𝐨𝐠𝐢𝐧</a>
         {% endif %}
     </div>
 
