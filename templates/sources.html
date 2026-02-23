@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="form-container" style="max-width: 800px;">
+    <h1>Sources & Project Credits</h1>
+    <p style="color: #666; margin-bottom: 2rem;">Citations for tools, languages, and standards used during development.</p>
+
+    <section style="margin-bottom: 2rem;">
+        <h3 style="color: var(--primary);">Programming Frameworks & Tools</h3>
+        <ul style="margin-left: 20px; margin-top: 10px; line-height: 1.8;">
+            <li><strong>Python (v3.10+)</strong>: Backend programming logic. Documented at <a href="https://docs.python.org/3/" target="_blank">docs.python.org</a></li>
+            <li><strong>Flask (v3.0.0)</strong>: Python web framework used for routing and rendering templates. Documented at <a href="https://flask.palletsprojects.com/" target="_blank">flask.palletsprojects.com</a></li>
+            <li><strong>SQLite3</strong>: Built-in Python library for database management. Used for persistent data storage of items and users.</li>
+            <li><strong>Werkzeug</strong>: Web Server Gateway Interface (WSGI) web application library, used specifically for secure password hashing and secure file uploads.</li>
+        </ul>
+    </section>
+
+    <section style="margin-bottom: 2rem;">
+        <h3 style="color: var(--primary);">Design & Accessibility Standards</h3>
+        <ul style="margin-left: 20px; margin-top: 10px; line-height: 1.8;">
+            <li><strong>W3C Web Content Accessibility Guidelines (WCAG)</strong>: Site developed using ARIA labels, semantic HTML (<code>&lt;nav&gt;</code>, <code>&lt;main&gt;</code>, <code>&lt;header&gt;</code>), and high color contrast. See <a href="https://www.w3.org/WAI/standards-guidelines/wcag/" target="_blank">w3.org/WAI</a></li>
+            <li><strong>Responsive CSS</strong>: Layout managed entirely through CSS Flexbox, CSS Grid, and Media Queries without relying on external UI libraries like Bootstrap.</li>
+        </ul>
+    </section>
+</div>
+{% endblock %}

@@ -4,54 +4,68 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SLHS Lost & Found</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- Google Fonts: Bitter (Regular 400 Italic) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@1,400&display=swap" rel="stylesheet">
+
+    <!-- CACHE BUSTER ADDED HERE (?v=1.3) to force the newest style to load -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=1.3">
+    <meta name="description" content="Seven Lakes High School Lost and Found System">
 </head>
 <body>
-    <nav>
-        <a href="{{ url_for('index') }}" class="logo">𝒮𝐿𝐻𝒮 𝐿𝑜𝓈𝓉 𝒶𝓃𝒹 𝐹𝑜𝓊𝓃𝒹</a>
-        
-        <!-- Desktop Navigation -->
-        <ul class="nav-links desktop-nav">
-            <li><a href="{{ url_for('index') }}">𝐇𝐨𝐦𝐞</a></li>
-            <li><a href="{{ url_for('report') }}">𝐑𝐞𝐩𝐨𝐫𝐭 𝐈𝐭𝐞𝐦</a></li>
-            <li><a href="{{ url_for('items') }}">𝐁𝐫𝐨𝐰𝐬𝐞 𝐈𝐭𝐞𝐦𝐬</a></li>
-            {% if session.get('user_id') %}
-                <li><a href="{{ url_for('dashboard') }}">𝐀𝐝𝐦𝐢𝐧 𝐃𝐚𝐬𝐡𝐛𝐨𝐚𝐫𝐝</a></li>
-                <li><a href="{{ url_for('logout') }}">𝐋𝐨𝐠𝐨𝐮𝐭</a></li>
-            {% else %}
-                <li><a href="{{ url_for('login') }}">𝐋𝐨𝐠𝐢𝐧</a></li>
-            {% endif %}
-        </ul>
+    <header>
+        <nav aria-label="Main Navigation">
+            <a href="{{ url_for('index') }}" class="logo" aria-label="SLHS Lost and Found Home">
+                <img src="{{ url_for('static', filename='logo_icon.png') }}" alt="Box Icon" class="logo-img">
+                SLHS Lost & Found
+            </a>
+            
+            <!-- Desktop Navigation -->
+            <ul class="nav-links desktop-nav" role="menubar">
+                <li role="none"><a role="menuitem" href="{{ url_for('index') }}">Home</a></li>
+                <li role="none"><a role="menuitem" href="{{ url_for('report', type='found') }}">Report Item</a></li>
+                <li role="none"><a role="menuitem" href="{{ url_for('items') }}">Browse Items</a></li>
+                {% if session.get('user_id') %}
+                    <li role="none"><a role="menuitem" href="{{ url_for('dashboard') }}">Admin Dashboard</a></li>
+                    <li role="none"><a role="menuitem" href="{{ url_for('logout') }}">Logout</a></li>
+                {% else %}
+                    <li role="none"><a role="menuitem" href="{{ url_for('login') }}">Login</a></li>
+                {% endif %}
+            </ul>
 
-        <!-- Mobile Menu Toggle -->
-        <button class="menu-toggle" onclick="toggleMenu()">&#9776;</button>
-    </nav>
+            <!-- Mobile Menu Toggle -->
+            <button class="menu-toggle" onclick="toggleMenu()" aria-label="Open Mobile Menu" aria-expanded="false" aria-controls="sideMenu">&#9776;</button>
+        </nav>
+    </header>
 
     <!-- Side Menu Drawer -->
-    <div class="side-menu" id="sideMenu">
+    <div class="side-menu" id="sideMenu" role="navigation" aria-label="Mobile Navigation" aria-hidden="true">
         <div class="side-menu-header">
-            <h2>𝗠𝗲𝗻𝘂</h2>
-            <button class="close-btn" onclick="toggleMenu()">&times;</button>
+            <h2>Menu</h2>
+            <button class="close-btn" onclick="toggleMenu()" aria-label="Close Menu">&times;</button>
         </div>
-        <a href="{{ url_for('index') }}">𝐇𝐨𝐦𝐞</a>
-        <a href="{{ url_for('report') }}">𝐑𝐞𝐩𝐨𝐫𝐭 𝐈𝐭𝐞𝐦</a>
-        <a href="{{ url_for('items') }}">𝐁𝐫𝐨𝐰𝐬𝐞 𝐈𝐭𝐞𝐦𝐬</a>
+        <a href="{{ url_for('index') }}">Home</a>
+        <a href="{{ url_for('report', type='found') }}">Report Found Item</a>
+        <a href="{{ url_for('report', type='lost') }}">Report Lost Item</a>
+        <a href="{{ url_for('items') }}">Browse Items</a>
         {% if session.get('user_id') %}
-            <a href="{{ url_for('dashboard') }}">𝐀𝐝𝐦𝐢𝐧 𝐃𝐚𝐬𝐡𝐛𝐨𝐚𝐫𝐝</a>
-            <a href="{{ url_for('logout') }}">𝐋𝐨𝐠𝐨𝐮𝐭</a>
+            <a href="{{ url_for('dashboard') }}">Admin Dashboard</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
         {% else %}
-            <a href="{{ url_for('login') }}">𝐋𝐨𝐠𝐢𝐧</a>
+            <a href="{{ url_for('login') }}">Login</a>
         {% endif %}
     </div>
 
     <!-- Menu Overlay -->
-    <div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
+    <div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()" aria-hidden="true"></div>
 
-    <main>
+    <main id="main-content">
         <!-- Flash Messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
-                <ul class="flash-messages">
+                <ul class="flash-messages" role="alert">
                 {% for category, message in messages %}
                     <li class="flash {{ category }}">{{ message }}</li>
                 {% endfor %}
@@ -67,8 +81,10 @@
         <p>&copy; 2025 Seven Lakes High School Lost & Found System</p>
         <div class="footer-links">
             <a href="{{ url_for('contact') }}">Contact Us</a>
-            <span class="separator">|</span>
+            <span class="separator" aria-hidden="true">|</span>
             <a href="{{ url_for('legal') }}">Legal & Privacy</a>
+            <span class="separator" aria-hidden="true">|</span>
+            <a href="{{ url_for('sources') }}">Sources & Credits</a>
         </div>
     </footer>
 
@@ -77,13 +93,20 @@
         function toggleMenu() {
             var menu = document.getElementById('sideMenu');
             var overlay = document.getElementById('menuOverlay');
+            var toggleBtn = document.querySelector('.menu-toggle');
             
-            if (menu.classList.contains('active')) {
+            var isActive = menu.classList.contains('active');
+            
+            if (isActive) {
                 menu.classList.remove('active');
                 overlay.classList.remove('active');
+                menu.setAttribute('aria-hidden', 'true');
+                toggleBtn.setAttribute('aria-expanded', 'false');
             } else {
                 menu.classList.add('active');
                 overlay.classList.add('active');
+                menu.setAttribute('aria-hidden', 'false');
+                toggleBtn.setAttribute('aria-expanded', 'true');
             }
         }
     </script>

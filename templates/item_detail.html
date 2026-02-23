@@ -1,19 +1,27 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<a href="{{ url_for('items') }}" style="display: inline-block; margin-bottom: 1rem;">&larr; Back to Listings</a>
+<!-- Use JavaScript to go back to the correct tab -->
+<a href="javascript:history.back()" style="display: inline-block; margin-bottom: 1rem;">&larr; Back to Listings</a>
 
 <div class="detail-container">
     <div style="flex: 1; min-width: 300px; ">
         {% if item.image_file %}
-            <img src="{{ url_for('static', filename='uploads/' + item.image_file) }}" alt="{{ item.title }}" class="detail-image">
+            <img src="{{ url_for('static', filename='uploads/' + item.image_file) }}" alt="Photo of {{ item.title }}" class="detail-image">
         {% else %}
             <div style="width: 100%; height: 300px; background: #eee; display: flex; align-items: center; justify-content: center;">No Image Available</div>
         {% endif %}
     </div>
     
     <div style="flex: 1; min-width: 300px;">
-        <h1 style="color: var(--primary);">{{ item.title }}</h1>
+        <h1 style="color: var(--primary);">
+            {% if item.report_type == 'lost' %}
+                <span style="background-color: var(--accent); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.9rem; vertical-align: middle; margin-right: 5px;">LOST</span>
+            {% else %}
+                <span style="background-color: var(--secondary); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.9rem; vertical-align: middle; margin-right: 5px;">FOUND</span>
+            {% endif %}
+            {{ item.title }}
+        </h1>
         <p style="margin-top: 0.5rem; font-style: italic; color: #666;">Reported on {{ item.date_found }}</p>
         
         <div style="margin: 2rem 0;">
@@ -22,14 +30,19 @@
         </div>
 
         <div style="margin: 2rem 0;">
-            <h3>Location Found</h3>
+            <h3>Location</h3>
             <p>{{ item.location }}</p>
         </div>
 
         <!-- Claim Request Form -->
         <div style="background: #f1f8ff; padding: 1.5rem; border-radius: 8px; border: 2px solid black;">
-            <h3>Is this yours?</h3>
-            <p style="margin-bottom: 1rem; font-size: 0.9rem;">Submit a claim request below. The Admin will review your proof and contact you directly.</p>
+            {% if item.report_type == 'found' %}
+                <h3>Is this yours?</h3>
+                <p style="margin-bottom: 1rem; font-size: 0.9rem;">Submit a claim request below. The Admin will review your proof and contact you directly.</p>
+            {% else %}
+                <h3>Did you find this?</h3>
+                <p style="margin-bottom: 1rem; font-size: 0.9rem;">Submit a note below letting the admin know where you turned it in, or where you have it.</p>
+            {% endif %}
             
             <form method="post">
                 <div class="form-group">
@@ -43,11 +56,13 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="proof_description">Proof of Ownership</label>
-                    <textarea name="proof_description" rows="3" required placeholder="Describe something not visible in the photo (e.g., 'There is a sticker on the bottom')..." style="width:100%; padding:8px; margin-bottom:10px;"></textarea>
+                    <label for="proof_description">
+                        {% if item.report_type == 'found' %}Proof of Ownership{% else %}Where is it now?{% endif %}
+                    </label>
+                    <textarea name="proof_description" rows="3" required placeholder="{% if item.report_type == 'found' %}Describe something not visible in the photo...{% else %}I turned it into the main office...{% endif %}" style="width:100%; padding:8px; margin-bottom:10px;"></textarea>
                 </div>
 
-                <button type="submit" class="btn">Send Claim Request</button>
+                <button type="submit" class="btn">Send Request</button>
             </form>
         </div>
     </div>

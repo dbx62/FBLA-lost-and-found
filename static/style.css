@@ -7,13 +7,19 @@
     --dark: #25347a; 
     --text-color: black;
     --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    --font-title: 'Georgia', 'Times New Roman', Times, serif; 
+    --font-title: 'Bitter', serif; /* Bitter Font explicitly defined */
 }
 
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0; 
+}
+
+/* Accessibility: Focus outlines for keyboard navigation */
+*:focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: 2px;
 }
 
 body {
@@ -46,11 +52,23 @@ nav {
 }
 
 .logo {
-    font-family: 'Times New Roman', Times, serif;
+    font-family: var(--font-title);
+    font-weight: 400;
+    font-style: italic;
     font-size: 1.7rem;
-    font-weight: bold;
     text-decoration: none;
     color: white;
+    display: flex;
+    align-items: center;
+    gap: 12px; /* Adds space between the icon and text */
+}
+
+.logo-img {
+    height: 34px; /* Slightly larger logo */
+    width: auto;
+    -webkit-filter: brightness(0) invert(1);
+    filter: brightness(0) invert(1); /* Turns the dark image pure white */
+    display: block;
 }
 
 .nav-links {
@@ -171,7 +189,7 @@ main {
 .flash.success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
 .flash.error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
 
-/* --- Forms --- */
+/* --- Forms & Buttons --- */
 .form-container {
     background: white;
     padding: 2rem;
@@ -233,6 +251,21 @@ button.btn:hover, .btn:hover {
     background-color: #7f8c8d;
 }
 
+/* Toggle Tabs */
+.toggle-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+.toggle-tabs .btn {
+    background-color: #ccc;
+    color: #333;
+}
+.toggle-tabs .btn.active {
+    background-color: var(--primary);
+    color: white;
+}
+
 /* --- Item Grid --- */
 .item-grid {
     display: grid;
@@ -274,6 +307,7 @@ button.btn:hover, .btn:hover {
     font-size: 1.2rem;
     margin-bottom: 0.5rem;
     color: var(--primary);
+    
     display: -webkit-box;
     -webkit-line-clamp: 2;
     line-clamp: 2;
@@ -356,9 +390,23 @@ button.btn:hover, .btn:hover {
 
 .admin-table th:last-child, 
 .admin-table td:last-child {
-    width: 180px; 
+    width: 200px; /* Widened slightly to fit fixed buttons */
     white-space: normal;
     overflow: visible;
+}
+
+/* NEW: Bulletproof rule to force exact identical sizes for buttons AND links */
+.admin-table .btn {
+    width: 85px !important;
+    height: 32px !important; /* Explicitly lock height */
+    padding: 0 !important;   /* Remove variable padding */
+    display: inline-flex !important; /* Flexbox ignores differences between <button> and <a> */
+    justify-content: center;
+    align-items: center;
+    font-size: 0.85rem !important;
+    margin: 2px;
+    box-sizing: border-box;
+    text-decoration: none;
 }
 
 /* --- Footer --- */
@@ -460,6 +508,7 @@ footer {
     cursor: pointer;
     min-width: 30px; 
     text-align: right;
+    font-style: normal; /* Keep the X button from being italicized */
 }
 
 .close-modal:hover {
@@ -552,6 +601,55 @@ footer {
     .modal-content {
         width: 95%;
         margin: 10% auto;
+    }
+
+    /* Mobile Admin Tables converted to Cards */
+    .admin-table, .admin-table tbody, .admin-table tr, .admin-table td {
+        display: block;
+        width: 100%;
+    }
+    .admin-table thead {
+        display: none; /* Hide headers */
+    }
+    .admin-table tr {
+        margin-bottom: 15px;
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .admin-table td {
+        text-align: right;
+        padding: 8px 5px;
+        border-bottom: 1px solid #eee;
+        position: relative;
+        padding-left: 45%; 
+        white-space: normal;
+        overflow-wrap: break-word;
+    }
+    .admin-table td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 10px;
+        width: 40%;
+        padding-right: 10px;
+        text-align: left;
+        font-weight: bold;
+        color: var(--primary);
+    }
+    .admin-table td:last-child {
+        border-bottom: none;
+        display: flex;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+        gap: 5px;
+        padding-top: 15px;
+    }
+    .admin-table td:last-child::before {
+        position: static;
+        width: auto;
+        margin-right: auto;
     }
 
     /* Mobile Search Bar Logic */

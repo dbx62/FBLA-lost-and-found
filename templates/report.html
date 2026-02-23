@@ -2,42 +2,155 @@
 
 {% block content %}
 <div class="form-container">
-    <h2>Report a Found Item</h2>
-    <p style="margin-bottom: 1rem; color: #666;">Thank you for your honesty. Please fill out the details below.</p>
+    <h2>Submit an Item Report</h2>
+    <p style="margin-bottom: 1rem; color: #666;">Please fill out the details below so we can track the item.</p>
     
     <form method="post" enctype="multipart/form-data">
+        
+        <div class="form-group" style="background-color: #f1f8ff; padding: 15px; border-radius: 8px; border-left: 4px solid var(--secondary);">
+            <label for="report_type">I am reporting an item that I:</label>
+            <select name="report_type" id="report_type" required onchange="updateForm()">
+                <option value="found" {% if current_type == 'found' %}selected{% endif %}>Found (I have it or turned it in)</option>
+                <option value="lost" {% if current_type == 'lost' %}selected{% endif %}>Lost (I am looking for it)</option>
+            </select>
+        </div>
+
         <div class="form-group">
-            <label for="title">Item Name</label>
-            <input type="text" id="title" name="title" required placeholder="e.g., Water Bottle">
+            <label for="title" id="title_label">Item Name</label>
+            <input type="text" id="title" name="title" required placeholder="e.g., Water Bottle, Graphing Calculator">
         </div>
 
         <div class="form-group">
             <label for="description">Detailed Description</label>
-            <textarea id="description" name="description" rows="4" required placeholder="Brand, contents, color..."></textarea>
+            <textarea id="description" name="description" rows="4" required placeholder="Brand, contents, color, specific scratches..."></textarea>
         </div>
 
         <div class="form-group">
-            <label for="location">Location Found</label>
-            <input type="text" id="location" name="location" required placeholder="e.g., Room 104">
+            <label for="location" id="location_label">Location Found</label>
+            <input type="text" id="location" name="location" required placeholder="e.g., Room 104, Cafeteria">
         </div>
 
         <div class="form-group">
-            <label for="date_found">Date Found</label>
+            <label for="date_found" id="date_label">Date Found</label>
             <input type="date" id="date_found" name="date_found" required>
         </div>
 
         <div class="form-group">
             <label for="contact_info">Your Full Name & ID Number (Private)</label>
-            <p style="font-size:0.8rem; color:#666; margin-bottom:5px;">This is only seen by the Admin so we can record who found the item.</p>
+            <p style="font-size:0.8rem; color:#666; margin-bottom:5px;">This is only seen by the Admin to verify records.</p>
             <input type="text" id="contact_info" name="contact_info" required placeholder="e.g., Jane Doe - K1234567">
         </div>
 
-        <div class="form-group">
-            <label for="image">Upload Photo (Optional)</label>
+        <!-- ID added here so we can hide it for Lost items -->
+        <div class="form-group" id="image_group">
+            <label for="image">Upload Photo (Highly recommended if Found)</label>
             <input type="file" id="image" name="image" accept="image/*">
         </div>
 
         <button type="submit" class="btn">Submit Report</button>
     </form>
 </div>
+
+<!-- ==========================================
+     DYNAMIC FORM & MULTI-STEP DEMO SCRIPT
+     ========================================== -->
+<script>
+    // --- Dynamic Form Simplification ---
+    function updateForm() {
+        var type = document.getElementById('report_type').value;
+        var locLabel = document.getElementById('location_label');
+        var dateLabel = document.getElementById('date_label');
+        var imgGroup = document.getElementById('image_group');
+        var descInput = document.getElementById('description');
+
+        if (type === 'lost') {
+            // Simplify for LOST items
+            locLabel.innerText = 'Last Known Location (Where did you leave it?)';
+            dateLabel.innerText = 'Date Lost (When did you last have it?)';
+            imgGroup.style.display = 'none'; // Hide photo upload
+            descInput.placeholder = "Brand, color, identifiable marks...";
+        } else {
+            // Detailed for FOUND items
+            locLabel.innerText = 'Location Found (Where did you find it?)';
+            dateLabel.innerText = 'Date Found (When did you find it?)';
+            imgGroup.style.display = 'block'; // Show photo upload
+            descInput.placeholder = "Brand, contents, color, specific scratches...";
+        }
+    }
+
+    // Run once on page load to set initial state
+    document.addEventListener("DOMContentLoaded", updateForm);
+
+
+    // --- Secret Multi-Step Demo Script ---
+    let demoStep = 0;
+    let isTyping = false; // Prevents triggering the next step while still typing
+
+    document.addEventListener('keydown', function(e) {
+        // Trigger on PageDown (clicker next) OR Alt+D (keyboard backup)
+        if ((e.key === 'PageDown' || (e.altKey && e.key === 'd')) && !isTyping) {
+            e.preventDefault(); 
+
+            const demoTitle = "Texas Instruments TI-84 Plus CE";
+            const demoDesc = "Black graphing calculator with a blue case. Has a small FBLA sticker on the back cover and is missing the battery door.";
+            const demoLoc = "Library - 2nd Floor Study Tables";
+            const demoContact = "Aditya Aggarwal - 1424500"; 
+
+            if (demoStep === 0) {
+                // Step 1: Set to 'Found' and type Title
+                isTyping = true;
+                document.getElementById('report_type').value = 'found';
+                updateForm();
+                typeText('title', demoTitle, 30, () => { 
+                    isTyping = false; 
+                    demoStep++; 
+                });
+            } 
+            else if (demoStep === 1) {
+                // Step 2: Type Description
+                isTyping = true;
+                typeText('description', demoDesc, 15, () => { 
+                    isTyping = false; 
+                    demoStep++; 
+                });
+            } 
+            else if (demoStep === 2) {
+                // Step 3: Type Location
+                isTyping = true;
+                typeText('location', demoLoc, 30, () => { 
+                    isTyping = false; 
+                    demoStep++; 
+                });
+            } 
+            else if (demoStep === 3) {
+                // Step 4: Instantly fill Date
+                let today = new Date().toISOString().split('T')[0];
+                document.getElementById('date_found').value = today;
+                demoStep++;
+            } 
+            else if (demoStep === 4) {
+                // Step 5: Type Contact Info
+                isTyping = true;
+                typeText('contact_info', demoContact, 30, () => { 
+                    isTyping = false; 
+                    demoStep++; 
+                });
+            }
+        }
+    });
+
+    function typeText(elementId, text, speed, callback) {
+        const el = document.getElementById(elementId);
+        el.value = ""; 
+        let i = 0;
+        const interval = setInterval(() => {
+            el.value += text.charAt(i);
+            i++;
+            if (i >= text.length) {
+                clearInterval(interval);
+                if (callback) callback(); 
+            }
+        }, speed);
+    }
+</script>
 {% endblock %}

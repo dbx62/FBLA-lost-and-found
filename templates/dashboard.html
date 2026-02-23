@@ -3,44 +3,44 @@
 {% block content %}
 <h1>Admin Dashboard</h1>
 
-<!-- Active Claims Section -->
+<!-- Active Claims/Inquiries Section -->
 <div style="margin-top: 2rem; background: #fff3cd; padding: 15px; border-radius: 8px; border: 1px solid #ffeeba;">
-    <h2 style="color: #856404;">Active Claim Requests</h2>
+    <h2 style="color: #856404;">Active Inquiries / Claims</h2>
     <p style="font-size: 0.9rem; margin-bottom: 10px;">
-        Review these claims. Verify the "Proof" matches the item description. 
-        Then contact the student to arrange pickup.
+        Review these responses. People who found lost items or are claiming found items appear here.
     </p>
     {% if claims %}
     <table class="admin-table">
         <thead>
             <tr>
                 <th>Item Title (ID)</th>
-                <th>Claimant Info</th>
-                <th>Claimant's Proof</th>
+                <th>Submitter Info</th>
+                <th>Message / Proof</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             {% for claim in claims %}
             <tr>
-                <td>
+                <td data-label="Item:">
                     <strong>{{ claim.item_title }}</strong><br>
                     <small>Item ID: {{ claim.item_id }}</small>
                 </td>
-                <td>
+                <td data-label="Submitter:">
                     <strong>{{ claim.claimer_name }}</strong><br>
                     {{ claim.claimer_contact }}
                 </td>
-                <td>{{ claim.proof_description }}</td>
-                <td>
-                    <a href="{{ url_for('delete_claim', id=claim.id) }}" class="btn btn-danger" style="padding: 5px 10px; font-size: 0.8rem;" onclick="return confirm('Dismiss this claim request?')">Dismiss</a>
+                <td data-label="Message:">{{ claim.proof_description }}</td>
+                <td data-label="Actions:">
+                    <!-- Inline padding removed, size controlled by CSS -->
+                    <a href="{{ url_for('delete_claim', id=claim.id) }}" class="btn btn-danger" onclick="return confirm('Dismiss this message?')">Dismiss</a>
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
     {% else %}
-    <p>No active claims.</p>
+    <p>No active messages.</p>
     {% endif %}
 </div>
 
@@ -51,23 +51,29 @@
     <table class="admin-table">
         <thead>
             <tr>
-                <th>Item</th>
-                <th>Finder Info (Private)</th>
-                <th>Description</th>
+                <th>Type</th>
+                <th>Item Info</th>
+                <th>Reporter Info (Private)</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             {% for item in pending %}
             <tr>
-                <td>
-                    <strong>{{ item.title }}</strong><br>
-                    <small>{{ item.date_found }}</small>
+                <td data-label="Type:">
+                    {% if item.report_type == 'lost' %}
+                        <span style="color: var(--accent); font-weight: bold;">LOST</span>
+                    {% else %}
+                        <span style="color: var(--secondary); font-weight: bold;">FOUND</span>
+                    {% endif %}
                 </td>
-                <td style="color: var(--accent); font-weight: bold;">{{ item.contact_info }}</td>
-                <td>{{ item.description[:50] }}...</td>
-                <td>
-                    <button class="btn btn-preview" style="padding: 5px 10px; font-size: 0.8rem;"
+                <td data-label="Item:">
+                    <strong>{{ item.title }}</strong><br>
+                    <small>{{ item.date_found }} - {{ item.location }}</small>
+                </td>
+                <td data-label="Reporter:" style="color: var(--accent); font-weight: bold;">{{ item.contact_info }}</td>
+                <td data-label="Actions:">
+                    <button class="btn btn-preview"
                             data-title="{{ item.title }}"
                             data-desc="{{ item.description }}"
                             data-location="{{ item.location }}"
@@ -78,8 +84,8 @@
                         Preview
                     </button>
                     
-                    <a href="{{ url_for('approve', id=item.id) }}" class="btn" style="padding: 5px 10px; font-size: 0.8rem;">Approve</a>
-                    <a href="{{ url_for('delete', id=item.id) }}" class="btn btn-danger" style="padding: 5px 10px; font-size: 0.8rem;" onclick="return confirm('Are you sure?')">Delete</a>
+                    <a href="{{ url_for('approve', id=item.id) }}" class="btn">Approve</a>
+                    <a href="{{ url_for('delete', id=item.id) }}" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
                 </td>
             </tr>
             {% endfor %}
@@ -96,22 +102,26 @@
     <table class="admin-table">
         <thead>
             <tr>
-                <th>ID</th>
+                <th>Type</th>
                 <th>Item</th>
-                <th>Finder Info (Private)</th>
-                <th>Status</th>
+                <th>Reporter Info (Private)</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             {% for item in approved %}
             <tr>
-                <td>{{ item.id }}</td>
-                <td>{{ item.title }}</td>
-                <td style="color: #666;">{{ item.contact_info }}</td>
-                <td><span style="background: #d4edda; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem;">Live</span></td>
-                <td>
-                    <button class="btn btn-preview" style="padding: 7px 10px; font-size: 0.8rem;"
+                <td data-label="Type:">
+                    {% if item.report_type == 'lost' %}
+                        <span style="color: var(--accent); font-weight: bold;">LOST</span>
+                    {% else %}
+                        <span style="color: var(--secondary); font-weight: bold;">FOUND</span>
+                    {% endif %}
+                </td>
+                <td data-label="Item:">{{ item.title }}</td>
+                <td data-label="Reporter:" style="color: #666;">{{ item.contact_info }}</td>
+                <td data-label="Actions:">
+                    <button class="btn btn-preview"
                             data-title="{{ item.title }}"
                             data-desc="{{ item.description }}"
                             data-location="{{ item.location }}"
@@ -121,7 +131,7 @@
                             onclick="openPreview(this)">
                         Preview
                     </button>
-                    <a href="{{ url_for('delete', id=item.id) }}" class="btn btn-danger" style="padding: 5px 10px; font-size: 0.8rem;" onclick="return confirm('Delete this item (and all its claims)?')">Remove</a>
+                    <a href="{{ url_for('delete', id=item.id) }}" class="btn btn-danger" onclick="return confirm('Delete this item (and all its claims)?')">Remove</a>
                 </td>
             </tr>
             {% endfor %}
@@ -130,31 +140,31 @@
 </div>
 
 <!-- Preview Modal -->
-<div id="previewModal" class="modal">
+<div id="previewModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <div class="modal-content">
         <div class="modal-header">
             <h2 id="modalTitle">Item Title</h2>
-            <span class="close-modal" onclick="closePreview()">&times;</span>
+            <button class="close-modal" onclick="closePreview()" aria-label="Close Preview" style="background:none; border:none;">&times;</button>
         </div>
         <div class="modal-body">
-            <img id="modalImg" src="" alt="Item Image" class="modal-preview-img" style="display:none;">
+            <img id="modalImg" src="" alt="Item Preview Image" class="modal-preview-img" style="display:none;">
             
             <span class="modal-label">Description:</span>
             <p id="modalDesc"></p>
             
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px;">
                 <div>
-                    <span class="modal-label">Location Found:</span>
+                    <span class="modal-label">Location:</span>
                     <p id="modalLoc"></p>
                 </div>
                 <div>
-                    <span class="modal-label">Date Found:</span>
+                    <span class="modal-label">Date:</span>
                     <p id="modalDate"></p>
                 </div>
             </div>
 
             <div style="margin-top: 15px; padding: 10px; background-color: #ffeeba; border-radius: 4px;">
-                <span class="modal-label" style="color: #856404; margin-top: 0;">Finder's Info (Private):</span>
+                <span class="modal-label" style="color: #856404; margin-top: 0;">Reporter's Info (Private):</span>
                 <p id="modalContact" style="font-weight: bold; color: #333;"></p>
             </div>
         </div>
@@ -171,7 +181,6 @@
     var modalContact = document.getElementById("modalContact");
 
     function openPreview(btn) {
-        // Retrieve data attributes
         var title = btn.getAttribute('data-title');
         var desc = btn.getAttribute('data-desc');
         var loc = btn.getAttribute('data-location');
@@ -179,14 +188,12 @@
         var contact = btn.getAttribute('data-contact');
         var imgFile = btn.getAttribute('data-img');
 
-        // Populate modal fields
         modalTitle.innerText = title;
         modalDesc.innerText = desc;
         modalLoc.innerText = loc;
         modalDate.innerText = date;
         modalContact.innerText = contact;
 
-        // Show image if exists
         if (imgFile && imgFile !== 'None' && imgFile !== '') {
             modalImg.src = "/static/uploads/" + imgFile;
             modalImg.style.display = "block";
@@ -201,7 +208,6 @@
         modal.style.display = "none";
     }
 
-    // Close modal on outside click
     window.onclick = function(event) {
         if (event.target == modal) {
             modal.style.display = "none";

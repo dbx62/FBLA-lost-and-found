@@ -43,6 +43,7 @@ def init_db():
         db.execute('''
             CREATE TABLE IF NOT EXISTS items (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+                report_type TEXT NOT NULL DEFAULT 'found', 
                 title TEXT NOT NULL,
                 description TEXT NOT NULL,
                 location TEXT NOT NULL,
@@ -94,13 +95,17 @@ def allowed_file(filename):
 @app.route('/')
 def index():
     db = get_db()
-    # Fetch recent approved items for the homepage
-    items = db.execute('SELECT * FROM items WHERE status = "approved" ORDER BY id DESC LIMIT 3').fetchall()
+    # Fetch recent approved found items for the homepage
+    items = db.execute('SELECT * FROM items WHERE status = "approved" AND report_type = "found" ORDER BY id DESC LIMIT 3').fetchall()
     return render_template('index.html', items=items)
 
 @app.route('/report', methods=('GET', 'POST'))
 def report():
+    # Pass 'lost' or 'found' into the URL (e.g. /report?type=lost)
+    report_type_arg = request.args.get('type', 'found')
+    
     if request.method == 'POST':
+        report_type = request.form['report_type']
         title = request.form['title']
         description = request.form['description']
         location = request.form['location']
@@ -113,21 +118,20 @@ def report():
             file = request.files['image']
             if file and allowed_file(file.filename):
                 filename = secure_filename(file.filename)
-                # Ensure unique filename
                 import uuid
                 filename = f"{uuid.uuid4().hex}_{filename}"
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
         db = get_db()
         db.execute(
-            'INSERT INTO items (title, description, location, date_found, contact_info, image_file) VALUES (?, ?, ?, ?, ?, ?)',
-            (title, description, location, date_found, contact_info, filename)
+            'INSERT INTO items (report_type, title, description, location, date_found, contact_info, image_file) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            (report_type, title, description, location, date_found, contact_info, filename)
         )
         db.commit()
-        flash('Item reported successfully. Pending admin approval.', 'success')
+        flash(f'Item reported successfully. Pending admin approval.', 'success')
         return redirect(url_for('index'))
 
-    return render_template('report.html')
+    return render_template('report.html', current_type=report_type_arg)
 
 @app.route('/items')
 def items():
@@ -136,12 +140,14 @@ def items():
     
     if query:
         search_term = f"%{query}%"
+        # SECURITY UPDATE: Hardcoded report_type = "found" to protect privacy of lost items
         items = db.execute(
-            'SELECT * FROM items WHERE status = "approved" AND (title LIKE ? OR description LIKE ? OR location LIKE ?)',
+            'SELECT * FROM items WHERE status = "approved" AND report_type = "found" AND (title LIKE ? OR description LIKE ? OR location LIKE ?)',
             (search_term, search_term, search_term)
         ).fetchall()
     else:
-        items = db.execute('SELECT * FROM items WHERE status = "approved" ORDER BY id DESC').fetchall()
+        # SECURITY UPDATE: Hardcoded report_type = "found"
+        items = db.execute('SELECT * FROM items WHERE status = "approved" AND report_type = "found" ORDER BY id DESC').fetchall()
         
     return render_template('items.html', items=items, query=query)
 
@@ -164,7 +170,7 @@ def item_detail(id):
                    (id, item['title'], claimer_name, claimer_contact, proof_description))
         db.commit()
         
-        flash(f"Claim request submitted. An admin will contact you at {claimer_contact}.", 'success')
+        flash(f"Inquiry submitted. An admin will contact you at {claimer_contact}.", 'success')
         return redirect(url_for('item_detail', id=id))
 
     return render_template('item_detail.html', item=item)
@@ -178,6 +184,10 @@ def contact():
 @app.route('/legal')
 def legal():
     return render_template('legal.html')
+
+@app.route('/sources')
+def sources():
+    return render_template('sources.html')
 
 # --- Admin Routes ---
 

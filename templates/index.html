@@ -7,8 +7,10 @@
         Did you lose something? Or did you find something that isn't yours?<br>
     </p>
     <div>
-        <a href="{{ url_for('report') }}" class="btn">I Found Something</a>
-        <a href="{{ url_for('items') }}" class="btn" style="background-color: #c7470c; margin-left: 10px;">I Lost Something</a>
+        <!-- Link updated to specify type=found -->
+        <a href="{{ url_for('report', type='found') }}" class="btn">I Found Something</a>
+        <!-- Link updated to specify type=lost -->
+        <a href="{{ url_for('report', type='lost') }}" class="btn" style="background-color: #c7470c; margin-left: 10px;">I Lost Something</a>
     </div>
 </div>
 
@@ -17,7 +19,7 @@
     {% for item in items %}
     <div class="item-card">
         {% if item.image_file %}
-            <img src="{{ url_for('static', filename='uploads/' + item.image_file) }}" alt="{{ item.title }}" class="item-image">
+            <img src="{{ url_for('static', filename='uploads/' + item.image_file) }}" alt="Photo of {{ item.title }}" class="item-image">
         {% else %}
             <div class="item-image" style="display:flex;align-items:center;justify-content:center;color:#888;">No Photo</div>
         {% endif %}

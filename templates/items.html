@@ -7,40 +7,45 @@
     <div class="search-container">
         <!-- Mobile Toggle Button (Visible only on small screens) -->
         <button class="mobile-search-toggle" onclick="toggleSearch()" aria-label="Open Search">
-            &#128269; <!-- Magnifying Glass Icon -->
+            &#128269;
         </button>
 
         <!-- Search Form -->
-        <form action="{{ url_for('items') }}" method="get" class="search-form" id="searchForm">
-            <input type="text" name="q" placeholder="Search items..." value="{{ query }}">
+        <form action="{{ url_for('items') }}" method="get" class="search-form" id="searchForm" role="search">
+            <input type="text" name="q" placeholder="Search found items..." value="{{ query }}" aria-label="Search query">
             <button type="submit" class="btn">Search</button>
-            <!-- Close Button (Visible only on mobile when search is open) -->
-            <button type="button" class="mobile-search-close" onclick="toggleSearch()">&times;</button>
+            <button type="button" class="mobile-search-close" onclick="toggleSearch()" aria-label="Close search">&times;</button>
         </form>
     </div>
 </div>
+
+<p style="color: #666; margin-bottom: 2rem;">
+    Look through the items below that have been turned in. If you see something that belongs to you, click "Is this yours?" to submit a claim to the administration.
+</p>
 
 {% if query %}
     <p>Showing results for: "<strong>{{ query }}</strong>"</p>
 {% endif %}
 
-<div class="item-grid">
+<div class="item-grid" role="list">
     {% for item in items %}
-    <div class="item-card">
+    <div class="item-card" role="listitem">
         {% if item.image_file %}
-            <img src="{{ url_for('static', filename='uploads/' + item.image_file) }}" alt="{{ item.title }}" class="item-image">
+            <img src="{{ url_for('static', filename='uploads/' + item.image_file) }}" alt="Photo of {{ item.title }}" class="item-image">
         {% else %}
-            <div class="item-image" style="display:flex;align-items:center;justify-content:center;color:#888;">No Photo</div>
+            <div class="item-image" style="display:flex;align-items:center;justify-content:center;color:#888;" aria-hidden="true">No Photo</div>
         {% endif %}
         <div class="item-details">
             <h3 class="item-title">{{ item.title }}</h3>
-            <p class="meta"><strong>Found:</strong> {{ item.location }}</p>
+            <p class="meta"><strong>Location:</strong> {{ item.location }}</p>
             <p class="meta"><strong>Date:</strong> {{ item.date_found }}</p>
-            <a href="{{ url_for('item_detail', id=item.id) }}" class="btn" style="width: 100%; text-align: center; margin-top: 10px;">Is this yours?</a>
+            <a href="{{ url_for('item_detail', id=item.id) }}" class="btn" style="width: 100%; text-align: center; margin-top: 10px;">
+                Is this yours?
+            </a>
         </div>
     </div>
     {% else %}
-        <p>No items found matching your criteria.</p>
+        <p>No found items matching your criteria.</p>
     {% endfor %}
 </div>
 
@@ -48,8 +53,6 @@
     function toggleSearch() {
         var form = document.getElementById('searchForm');
         var container = document.querySelector('.browse-header');
-        
-        // Toggle the active class to show/hide the form
         form.classList.toggle('active');
         container.classList.toggle('search-active');
     }
