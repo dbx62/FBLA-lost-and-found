@@ -41,13 +41,20 @@ body {
 
 /* --- Navigation --- */
 nav {
-    background: linear-gradient(to right, #25347a, #3348a7ec);
+    /* Keeping the rich dark gradient but adding 95% opacity so it's not washed out */
+    background: linear-gradient(to right, rgba(37, 52, 122, 0.95), rgba(51, 72, 167, 0.95));
+    /* Lighter blur to blend subtly without becoming milky */
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    /* Keeps the nav bar at the top of the screen */
+    position: sticky;
+    top: 0;
+    
     color: white;
     padding: 1rem 2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    position: relative;
     z-index: 100;
 }
 

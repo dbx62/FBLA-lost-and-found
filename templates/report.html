@@ -41,7 +41,6 @@
             <input type="text" id="contact_info" name="contact_info" required placeholder="e.g., Jane Doe - K1234567">
         </div>
 
-        <!-- ID added here so we can hide it for Lost items -->
         <div class="form-group" id="image_group">
             <label for="image">Upload Photo (Highly recommended if Found)</label>
             <input type="file" id="image" name="image" accept="image/*">
@@ -55,7 +54,6 @@
      DYNAMIC FORM & MULTI-STEP DEMO SCRIPT
      ========================================== -->
 <script>
-    // --- Dynamic Form Simplification ---
     function updateForm() {
         var type = document.getElementById('report_type').value;
         var locLabel = document.getElementById('location_label');
@@ -64,77 +62,49 @@
         var descInput = document.getElementById('description');
 
         if (type === 'lost') {
-            // Simplify for LOST items
             locLabel.innerText = 'Last Known Location (Where did you leave it?)';
             dateLabel.innerText = 'Date Lost (When did you last have it?)';
-            imgGroup.style.display = 'none'; // Hide photo upload
+            imgGroup.style.display = 'none';
             descInput.placeholder = "Brand, color, identifiable marks...";
         } else {
-            // Detailed for FOUND items
             locLabel.innerText = 'Location Found (Where did you find it?)';
             dateLabel.innerText = 'Date Found (When did you find it?)';
-            imgGroup.style.display = 'block'; // Show photo upload
+            imgGroup.style.display = 'block';
             descInput.placeholder = "Brand, contents, color, specific scratches...";
         }
     }
 
-    // Run once on page load to set initial state
     document.addEventListener("DOMContentLoaded", updateForm);
 
-
-    // --- Secret Multi-Step Demo Script ---
     let demoStep = 0;
-    let isTyping = false; // Prevents triggering the next step while still typing
+    let isTyping = false;
 
     document.addEventListener('keydown', function(e) {
-        // Trigger on PageDown (clicker next) OR Alt+D (keyboard backup)
         if ((e.key === 'PageDown' || (e.altKey && e.key === 'd')) && !isTyping) {
             e.preventDefault(); 
-
             const demoTitle = "Texas Instruments TI-84 Plus CE";
             const demoDesc = "Black graphing calculator with a blue case. Has a small FBLA sticker on the back cover and is missing the battery door.";
             const demoLoc = "Library - 2nd Floor Study Tables";
             const demoContact = "Aditya Aggarwal - 1424500"; 
 
             if (demoStep === 0) {
-                // Step 1: Set to 'Found' and type Title
                 isTyping = true;
                 document.getElementById('report_type').value = 'found';
                 updateForm();
-                typeText('title', demoTitle, 30, () => { 
-                    isTyping = false; 
-                    demoStep++; 
-                });
-            } 
-            else if (demoStep === 1) {
-                // Step 2: Type Description
+                typeText('title', demoTitle, 30, () => { isTyping = false; demoStep++; });
+            } else if (demoStep === 1) {
                 isTyping = true;
-                typeText('description', demoDesc, 15, () => { 
-                    isTyping = false; 
-                    demoStep++; 
-                });
-            } 
-            else if (demoStep === 2) {
-                // Step 3: Type Location
+                typeText('description', demoDesc, 15, () => { isTyping = false; demoStep++; });
+            } else if (demoStep === 2) {
                 isTyping = true;
-                typeText('location', demoLoc, 30, () => { 
-                    isTyping = false; 
-                    demoStep++; 
-                });
-            } 
-            else if (demoStep === 3) {
-                // Step 4: Instantly fill Date
+                typeText('location', demoLoc, 30, () => { isTyping = false; demoStep++; });
+            } else if (demoStep === 3) {
                 let today = new Date().toISOString().split('T')[0];
                 document.getElementById('date_found').value = today;
                 demoStep++;
-            } 
-            else if (demoStep === 4) {
-                // Step 5: Type Contact Info
+            } else if (demoStep === 4) {
                 isTyping = true;
-                typeText('contact_info', demoContact, 30, () => { 
-                    isTyping = false; 
-                    demoStep++; 
-                });
+                typeText('contact_info', demoContact, 30, () => { isTyping = false; demoStep++; });
             }
         }
     });

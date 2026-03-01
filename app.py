@@ -1,5 +1,6 @@
 import os
 import sqlite3
+import uuid
 from flask import Flask, render_template, request, redirect, url_for, flash, session, g
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -43,7 +44,7 @@ def init_db():
         db.execute('''
             CREATE TABLE IF NOT EXISTS items (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                report_type TEXT NOT NULL DEFAULT 'found', 
+                report_type TEXT NOT NULL DEFAULT 'found',
                 title TEXT NOT NULL,
                 description TEXT NOT NULL,
                 location TEXT NOT NULL,
@@ -95,13 +96,12 @@ def allowed_file(filename):
 @app.route('/')
 def index():
     db = get_db()
-    # Fetch recent approved found items for the homepage
+    # Fetch recent approved items for the homepage
     items = db.execute('SELECT * FROM items WHERE status = "approved" AND report_type = "found" ORDER BY id DESC LIMIT 3').fetchall()
     return render_template('index.html', items=items)
 
 @app.route('/report', methods=('GET', 'POST'))
 def report():
-    # Pass 'lost' or 'found' into the URL (e.g. /report?type=lost)
     report_type_arg = request.args.get('type', 'found')
     
     if request.method == 'POST':
@@ -118,6 +118,7 @@ def report():
             file = request.files['image']
             if file and allowed_file(file.filename):
                 filename = secure_filename(file.filename)
+                # Ensure unique filename
                 import uuid
                 filename = f"{uuid.uuid4().hex}_{filename}"
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
@@ -128,7 +129,7 @@ def report():
             (report_type, title, description, location, date_found, contact_info, filename)
         )
         db.commit()
-        flash(f'Item reported successfully. Pending admin approval.', 'success')
+        flash('Item reported successfully. Pending admin approval.', 'success')
         return redirect(url_for('index'))
 
     return render_template('report.html', current_type=report_type_arg)
@@ -136,20 +137,19 @@ def report():
 @app.route('/items')
 def items():
     query = request.args.get('q', '')
+    report_type = request.args.get('type', 'found')
     db = get_db()
     
     if query:
         search_term = f"%{query}%"
-        # SECURITY UPDATE: Hardcoded report_type = "found" to protect privacy of lost items
         items = db.execute(
-            'SELECT * FROM items WHERE status = "approved" AND report_type = "found" AND (title LIKE ? OR description LIKE ? OR location LIKE ?)',
-            (search_term, search_term, search_term)
+            'SELECT * FROM items WHERE status = "approved" AND report_type = ? AND (title LIKE ? OR description LIKE ? OR location LIKE ?)',
+            (report_type, search_term, search_term, search_term)
         ).fetchall()
     else:
-        # SECURITY UPDATE: Hardcoded report_type = "found"
-        items = db.execute('SELECT * FROM items WHERE status = "approved" AND report_type = "found" ORDER BY id DESC').fetchall()
+        items = db.execute('SELECT * FROM items WHERE status = "approved" AND report_type = ? ORDER BY id DESC', (report_type,)).fetchall()
         
-    return render_template('items.html', items=items, query=query)
+    return render_template('items.html', items=items, query=query, current_type=report_type)
 
 @app.route('/item/<int:id>', methods=('GET', 'POST'))
 def item_detail(id):
@@ -219,11 +219,13 @@ def dashboard():
         return redirect(url_for('login'))
     
     db = get_db()
-    pending = db.execute('SELECT * FROM items WHERE status = "pending"').fetchall()
-    approved = db.execute('SELECT * FROM items WHERE status = "approved"').fetchall()
+    pending_found = db.execute('SELECT * FROM items WHERE status = "pending" AND report_type = "found"').fetchall()
+    pending_lost = db.execute('SELECT * FROM items WHERE status = "pending" AND report_type = "lost"').fetchall()
+    live_found = db.execute('SELECT * FROM items WHERE status = "approved" AND report_type = "found"').fetchall()
+    active_lost = db.execute('SELECT * FROM items WHERE status = "approved" AND report_type = "lost"').fetchall()
     claims = db.execute('SELECT * FROM claims ORDER BY id DESC').fetchall()
     
-    return render_template('dashboard.html', pending=pending, approved=approved, claims=claims)
+    return render_template('dashboard.html', pending_found=pending_found, pending_lost=pending_lost, live_found=live_found, active_lost=active_lost, claims=claims)
 
 @app.route('/approve/<int:id>')
 def approve(id):
@@ -257,7 +259,12 @@ def delete_claim(id):
     flash('Claim dismissed.', 'success')
     return redirect(url_for('dashboard'))
 
+# =======================================================
+# BULLETPROOF DATABASE INITIALIZATION
+# This runs unconditionally when the app starts, ensuring 
+# the tables exist whether you use 'python app.py' OR 'flask run'
+# =======================================================
+init_db()
+
 if __name__ == '__main__':
-    if not os.path.exists(DATABASE):
-        init_db()
     app.run(debug=True, host='0.0.0.0')

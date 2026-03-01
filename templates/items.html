@@ -11,41 +11,44 @@
         </button>
 
         <!-- Search Form -->
-        <form action="{{ url_for('items') }}" method="get" class="search-form" id="searchForm" role="search">
-            <input type="text" name="q" placeholder="Search found items..." value="{{ query }}" aria-label="Search query">
+        <form action="{{ url_for('items') }}" method="get" class="search-form" id="searchForm">
+            <input type="hidden" name="type" value="{{ current_type }}">
+            <input type="text" name="q" placeholder="Search items..." value="{{ query }}">
             <button type="submit" class="btn">Search</button>
-            <button type="button" class="mobile-search-close" onclick="toggleSearch()" aria-label="Close search">&times;</button>
+            <button type="button" class="mobile-search-close" onclick="toggleSearch()">&times;</button>
         </form>
     </div>
 </div>
 
-<p style="color: #666; margin-bottom: 2rem;">
-    Look through the items below that have been turned in. If you see something that belongs to you, click "Is this yours?" to submit a claim to the administration.
-</p>
+<!-- TABS FOR LOST VS FOUND -->
+<div class="toggle-tabs" role="tablist">
+    <a href="{{ url_for('items', type='found', q=query) }}" class="btn {% if current_type == 'found' %}active{% endif %}" role="tab">Found Items</a>
+    <a href="{{ url_for('items', type='lost', q=query) }}" class="btn {% if current_type == 'lost' %}active{% endif %}" role="tab">Looking For</a>
+</div>
 
 {% if query %}
     <p>Showing results for: "<strong>{{ query }}</strong>"</p>
 {% endif %}
 
-<div class="item-grid" role="list">
+<div class="item-grid">
     {% for item in items %}
-    <div class="item-card" role="listitem">
+    <div class="item-card">
         {% if item.image_file %}
-            <img src="{{ url_for('static', filename='uploads/' + item.image_file) }}" alt="Photo of {{ item.title }}" class="item-image">
+            <img src="{{ url_for('static', filename='uploads/' + item.image_file) }}" alt="{{ item.title }}" class="item-image">
         {% else %}
-            <div class="item-image" style="display:flex;align-items:center;justify-content:center;color:#888;" aria-hidden="true">No Photo</div>
+            <div class="item-image" style="display:flex;align-items:center;justify-content:center;color:#888;">No Photo</div>
         {% endif %}
         <div class="item-details">
             <h3 class="item-title">{{ item.title }}</h3>
             <p class="meta"><strong>Location:</strong> {{ item.location }}</p>
             <p class="meta"><strong>Date:</strong> {{ item.date_found }}</p>
             <a href="{{ url_for('item_detail', id=item.id) }}" class="btn" style="width: 100%; text-align: center; margin-top: 10px;">
-                Is this yours?
+                {% if current_type == 'found' %}Is this yours?{% else %}I found this!{% endif %}
             </a>
         </div>
     </div>
     {% else %}
-        <p>No found items matching your criteria.</p>
+        <p>No items found matching your criteria in this category.</p>
     {% endfor %}
 </div>
 
