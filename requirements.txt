@@ -1,5 +1,5 @@
 Flask
-gunicorn
 Werkzeug
 psycopg[binary]
 python-dotenv
+gunicorn
