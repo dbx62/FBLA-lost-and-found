@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SLHS Lost &amp; Found{% endblock %}</title>
+
+    <!-- Google Fonts: Bitter (Regular 400 Italic) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@1,400&display=swap" rel="stylesheet">
+
+    <!-- Cache buster (?v=1.4) to force the newest stylesheet to load -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=1.4">
+    <meta name="description" content="Seven Lakes High School Lost and Found System">
+</head>
+<body>
+    <!-- Skip link: lets keyboard and screen-reader users jump past the nav -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <header>
+        <nav aria-label="Main navigation">
+            <a href="{{ url_for('index') }}" class="logo" aria-label="SLHS Lost and Found, home">
+                <img src="{{ url_for('static', filename='logo_icon.png') }}" alt="" class="logo-img">
+                SLHS Lost &amp; Found
+            </a>
+
+            <!-- Desktop Navigation -->
+            <ul class="nav-links desktop-nav">
+                <li><a href="{{ url_for('index') }}" {% if request.endpoint == 'index' %}aria-current="page"{% endif %}>Home</a></li>
+                <li><a href="{{ url_for('report', type='found') }}" {% if request.endpoint == 'report' %}aria-current="page"{% endif %}>Report Item</a></li>
+                <li><a href="{{ url_for('items') }}" {% if request.endpoint == 'items' %}aria-current="page"{% endif %}>Browse Items</a></li>
+                {% if session.get('user_id') %}
+                    <li><a href="{{ url_for('dashboard') }}" {% if request.endpoint == 'dashboard' %}aria-current="page"{% endif %}>Admin Dashboard</a></li>
+                    <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('login') }}" {% if request.endpoint == 'login' %}aria-current="page"{% endif %}>Login</a></li>
+                {% endif %}
+            </ul>
+
+            <!-- Mobile Menu Toggle -->
+            <button class="menu-toggle" id="menuToggle" aria-label="Open navigation menu" aria-expanded="false" aria-controls="sideMenu">&#9776;</button>
+        </nav>
+    </header>
+
+    <!-- Side Menu Drawer -->
+    <div class="side-menu" id="sideMenu" role="dialog" aria-modal="true" aria-label="Navigation menu" aria-hidden="true">
+        <div class="side-menu-header">
+            <h2>Menu</h2>
+            <button class="close-btn" id="menuClose" aria-label="Close navigation menu">&times;</button>
+        </div>
+        <a href="{{ url_for('index') }}">Home</a>
+        <a href="{{ url_for('report', type='found') }}">Report Found Item</a>
+        <a href="{{ url_for('report', type='lost') }}">Report Lost Item</a>
+        <a href="{{ url_for('items') }}">Browse Items</a>
+        {% if session.get('user_id') %}
+            <a href="{{ url_for('dashboard') }}">Admin Dashboard</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        {% else %}
+            <a href="{{ url_for('login') }}">Login</a>
+        {% endif %}
+    </div>
+
+    <!-- Menu Overlay -->
+    <div class="menu-overlay" id="menuOverlay" aria-hidden="true"></div>
+
+    <main id="main-content">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flash-messages">
+                {% for category, message in messages %}
+                    <li class="flash {{ category }}" role="{% if category == 'error' %}alert{% else %}status{% endif %}">{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 Seven Lakes High School Lost &amp; Found System</p>
+        <nav class="footer-links" aria-label="Footer">
+            <a href="{{ url_for('contact') }}">Contact Us</a>
+            <span class="separator" aria-hidden="true">|</span>
+            <a href="{{ url_for('legal') }}">Legal &amp; Privacy</a>
+            <span class="separator" aria-hidden="true">|</span>
+            <a href="{{ url_for('sources') }}">Sources &amp; Credits</a>
+        </nav>
+    </footer>
+
+    <!-- Site-wide scripts (kept in a separate file to fully separate languages) -->
+    <script src="{{ url_for('static', filename='script.js') }}?v=1.4" defer></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

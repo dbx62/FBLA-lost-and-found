@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#25347a">
+    <title>TI-84 Plus CE Calculator &middot; SLHS Lost &amp; Found</title>
+
+    <!-- Google Fonts: Bitter (Regular 400 Italic) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@1,400&display=swap" rel="stylesheet">
+
+    <!-- Cache buster (?v=1.5) to force the newest stylesheet to load -->
+    <link rel="stylesheet" href="static/style.css?v=1.5">
+    <meta name="description" content="Seven Lakes High School Lost and Found System">
+
+    <!-- Theme bootstrap: applies the saved light/dark choice before paint
+         so there is no flash of the wrong theme. -->
+    <script>
+        (function () {
+            try {
+                var saved = localStorage.getItem('slhs-theme');
+                var theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+                document.documentElement.setAttribute('data-theme', theme);
+            } catch (e) {}
+        })();
+    </script>
+</head>
+<body>
+    <!-- Skip link: lets keyboard and screen-reader users jump past the nav -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <header>
+        <nav aria-label="Main navigation">
+            <a href="#" class="logo" aria-label="SLHS Lost and Found, home">
+                <img src="static/logo_icon.png" alt="" class="logo-img">
+                <span>SLHS Lost &amp; Found</span>
+            </a>
+
+            <div class="nav-right">
+                <!-- Desktop Navigation -->
+                <ul class="nav-links desktop-nav">
+                    <li><a href="#" >Home</a></li>
+                    <li><a href="#" >Report</a></li>
+                    <li><a href="#" >Browse</a></li>
+                    
+                </ul>
+
+                <!-- Theme toggle -->
+                <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch color theme" title="Switch light / dark theme">
+                    <span class="theme-icon theme-icon-sun" aria-hidden="true">&#9728;</span>
+                    <span class="theme-icon theme-icon-moon" aria-hidden="true">&#9789;</span>
+                </button>
+
+                <!-- Account area (desktop) -->
+                <div class="nav-account desktop-nav">
+                    
+                        <a href="#" class="btn-nav-text">Log in</a>
+                        <a href="#" class="btn btn-primary btn-sm">Sign up</a>
+                    
+                </div>
+
+                <!-- Mobile Menu Toggle -->
+                <button class="menu-toggle" id="menuToggle" type="button" aria-label="Open navigation menu" aria-expanded="false" aria-controls="sideMenu">
+                    <span class="menu-bar"></span>
+                    <span class="menu-bar"></span>
+                    <span class="menu-bar"></span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Side Menu Drawer (mobile) -->
+    <aside class="side-menu" id="sideMenu" role="dialog" aria-modal="true" aria-label="Navigation menu" aria-hidden="true">
+        <div class="side-menu-header">
+            <span class="side-menu-title">Menu</span>
+            <button class="close-btn" id="menuClose" type="button" aria-label="Close navigation menu">&times;</button>
+        </div>
+
+        <!-- Account block -->
+        <div class="drawer-account">
+            
+                <p class="drawer-cta-text">Sign in to skip filling in your details every time.</p>
+                <a href="#" class="btn btn-primary btn-block">Create account</a>
+                <a href="#" class="btn btn-outline btn-block">Log in</a>
+            
+        </div>
+
+        <nav class="drawer-links" aria-label="Mobile navigation">
+            <a href="#"><span class="drawer-ico" aria-hidden="true">&#127968;</span> Home</a>
+            <a href="#"><span class="drawer-ico" aria-hidden="true">&#9989;</span> Report Found Item</a>
+            <a href="#"><span class="drawer-ico" aria-hidden="true">&#128269;</span> Report Lost Item</a>
+            <a href="#"><span class="drawer-ico" aria-hidden="true">&#128230;</span> Browse Items</a>
+            <a href="#"><span class="drawer-ico" aria-hidden="true">&#9990;</span> Contact</a>
+        </nav>
+
+        <button class="drawer-theme" id="drawerThemeToggle" type="button">
+            <span class="drawer-ico" aria-hidden="true">&#9789;</span>
+            <span data-theme-label>Switch theme</span>
+        </button>
+    </aside>
+
+    <!-- Menu Overlay -->
+    <div class="menu-overlay" id="menuOverlay" aria-hidden="true"></div>
+
+    <main id="main-content">
+        <!-- Flash Messages -->
+        
+            
+        
+
+        
+<!-- Use JavaScript to go back to the correct tab -->
+<a href="javascript:history.back()" class="back-link">&larr; Back to Listings</a>
+
+<div class="detail-container">
+    <div style="flex: 1; min-width: 300px; ">
+        
+            <img src="static/uploads/443eb9ee352a46e7860402ba28bc5091_Lunch_Box.jpeg" alt="Photo of TI-84 Plus CE Calculator" class="detail-image">
+        
+    </div>
+
+    <div style="flex: 1; min-width: 300px;">
+        <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+            
+                <span class="badge badge-found">Found</span>
+            
+            <span class="cat-chip" style="margin-bottom:0;">🔌 Electronics</span>
+        </div>
+        <h1 style="margin-top: 0.6rem;">TI-84 Plus CE Calculator</h1>
+        <p class="detail-meta-row"><span aria-hidden="true">&#128197;</span> Reported 3 week(s) ago &middot; 2026-06-02</p>
+
+        <div class="share-row">
+            <button type="button" class="btn btn-outline btn-sm js-share"
+                    data-url="#item-1"
+                    data-title="TI-84 Plus CE Calculator - SLHS Lost &amp; Found"
+                    data-label="&#128279; Share">&#128279; Share</button>
+        </div>
+
+        <div style="margin: 1.75rem 0;">
+            <h3>Description</h3>
+            <p>Found near the main entrance. Has a small sticker on the side and looks gently used.</p>
+        </div>
+
+        <div style="margin: 1.75rem 0;">
+            <h3>Location</h3>
+            <p class="detail-meta-row"><span aria-hidden="true">&#128205;</span> Library 2nd Floor</p>
+        </div>
+
+        <!-- Claim Request Form -->
+        <div class="claim-card">
+            
+                <h3>Is this yours?</h3>
+                <p style="margin-bottom: 1.1rem; font-size: 0.92rem; color: var(--muted);">Submit a claim request below. The admin will review your proof and contact you directly.</p>
+            
+
+            
+            <form method="post">
+                <div class="form-group">
+                    <label for="claimer_name">Your Name</label>
+                    <input type="text" id="claimer_name" name="claimer_name" autocomplete="name" required
+                           value="">
+                </div>
+
+                <div class="form-group">
+                    <label for="claimer_contact">Your Contact (Email/Phone)</label>
+                    <input type="text" id="claimer_contact" name="claimer_contact" required
+                           value="">
+                </div>
+
+                <div class="form-group">
+                    <label for="proof_description">
+                        Proof of Ownership
+                    </label>
+                    <textarea id="proof_description" name="proof_description" rows="3" required placeholder="Describe something not visible in the photo..."></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">Send Request</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 Seven Lakes High School Lost &amp; Found System</p>
+        <nav class="footer-links" aria-label="Footer">
+            <a href="#">Contact Us</a>
+            <span class="separator" aria-hidden="true">|</span>
+            <a href="#">Legal &amp; Privacy</a>
+            <span class="separator" aria-hidden="true">|</span>
+            <a href="#">Sources &amp; Credits</a>
+        </nav>
+    </footer>
+
+    <!-- Back to top -->
+    <button class="back-to-top" id="backToTop" type="button" aria-label="Back to top">&#8593;</button>
+
+    <!-- Site-wide scripts (kept in a separate file to fully separate languages) -->
+    <script src="static/script.js?v=1.5" defer></script>
+    
+</body>
+</html>

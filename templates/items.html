@@ -1,63 +1,102 @@
 {% extends 'base.html' %}
 
+{% block title %}Browse Items &middot; SLHS Lost &amp; Found{% endblock %}
+
 {% block content %}
 <div class="browse-header">
-    <h2 class="page-title">Browse Found Items</h2>
-    
+    <h2 class="page-title">{% if current_type == 'found' %}Browse Found Items{% else %}Items People Are Looking For{% endif %}</h2>
+
     <div class="search-container">
         <!-- Mobile Toggle Button (Visible only on small screens) -->
-        <button class="mobile-search-toggle" onclick="toggleSearch()" aria-label="Open Search">
+        <button class="mobile-search-toggle" aria-label="Open search" aria-expanded="false" aria-controls="searchForm">
             &#128269;
         </button>
 
         <!-- Search Form -->
         <form action="{{ url_for('items') }}" method="get" class="search-form" id="searchForm">
             <input type="hidden" name="type" value="{{ current_type }}">
+            <input type="hidden" name="category" value="{{ current_category }}">
+            <input type="hidden" name="sort" value="{{ current_sort }}">
             <input type="text" name="q" placeholder="Search items..." value="{{ query }}">
             <button type="submit" class="btn">Search</button>
-            <button type="button" class="mobile-search-close" onclick="toggleSearch()">&times;</button>
+            <button type="button" class="mobile-search-close" aria-label="Close search">&times;</button>
         </form>
     </div>
 </div>
 
 <!-- TABS FOR LOST VS FOUND -->
-<div class="toggle-tabs" role="tablist">
-    <a href="{{ url_for('items', type='found', q=query) }}" class="btn {% if current_type == 'found' %}active{% endif %}" role="tab">Found Items</a>
-    <a href="{{ url_for('items', type='lost', q=query) }}" class="btn {% if current_type == 'lost' %}active{% endif %}" role="tab">Looking For</a>
+<div class="toggle-tabs">
+    <a href="{{ url_for('items', type='found', q=query, category=current_category, sort=current_sort) }}" class="btn {% if current_type == 'found' %}active{% endif %}" {% if current_type == 'found' %}aria-current="true"{% endif %}>Found Items</a>
+    <a href="{{ url_for('items', type='lost', q=query, category=current_category, sort=current_sort) }}" class="btn {% if current_type == 'lost' %}active{% endif %}" {% if current_type == 'lost' %}aria-current="true"{% endif %}>Looking For</a>
 </div>
 
-{% if query %}
-    <p>Showing results for: "<strong>{{ query }}</strong>"</p>
-{% endif %}
+<!-- FILTER + SORT BAR -->
+<form class="filter-bar" action="{{ url_for('items') }}" method="get">
+    <input type="hidden" name="type" value="{{ current_type }}">
+    {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
+    <div class="filter-group">
+        <label for="category">Category</label>
+        <select id="category" name="category" class="js-autosubmit">
+            <option value="">All categories</option>
+            {% for cat in CATEGORIES %}
+                <option value="{{ cat }}" {% if current_category == cat %}selected{% endif %}>{{ cat|category_icon }} {{ cat }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="filter-group">
+        <label for="sort">Sort</label>
+        <select id="sort" name="sort" class="js-autosubmit">
+            <option value="newest" {% if current_sort == 'newest' %}selected{% endif %}>Newest first</option>
+            <option value="oldest" {% if current_sort == 'oldest' %}selected{% endif %}>Oldest first</option>
+        </select>
+    </div>
+    <div class="filter-spacer"></div>
+    <noscript><button class="btn" type="submit">Apply</button></noscript>
+</form>
+
+<p class="section-intro">
+    {{ items|length }} item{{ '' if items|length == 1 else 's' }}
+    {% if current_category %}in <strong>{{ current_category }}</strong>{% endif %}
+    {% if query %}matching "<strong>{{ query }}</strong>"{% else %}listed{% endif %}.
+    {% if query or current_category %}<a href="{{ url_for('items', type=current_type) }}" style="margin-left:8px;">Clear filters</a>{% endif %}
+</p>
 
 <div class="item-grid">
     {% for item in items %}
-    <div class="item-card">
-        {% if item.image_file %}
-            <img src="{{ url_for('static', filename='uploads/' + item.image_file) }}" alt="{{ item.title }}" class="item-image">
-        {% else %}
-            <div class="item-image" style="display:flex;align-items:center;justify-content:center;color:#888;">No Photo</div>
-        {% endif %}
+    <div class="item-card reveal">
+        <div class="item-image-wrap">
+            {% if current_type == 'found' %}
+                <span class="badge badge-found card-badge">Found</span>
+            {% else %}
+                <span class="badge badge-lost card-badge">Lost</span>
+            {% endif %}
+            {% if item.image_file %}
+                <img src="{{ url_for('static', filename='uploads/' + item.image_file) }}" alt="Photo of {{ item.title }}" class="item-image" loading="lazy">
+            {% else %}
+                <div class="item-image placeholder">No Photo</div>
+            {% endif %}
+        </div>
         <div class="item-details">
+            <span class="cat-chip">{{ item.category|category_icon }} {{ item.category }}</span>
             <h3 class="item-title">{{ item.title }}</h3>
-            <p class="meta"><strong>Location:</strong> {{ item.location }}</p>
-            <p class="meta"><strong>Date:</strong> {{ item.date_found }}</p>
-            <a href="{{ url_for('item_detail', id=item.id) }}" class="btn" style="width: 100%; text-align: center; margin-top: 10px;">
+            <p class="meta"><span class="meta-icon" aria-hidden="true">&#128205;</span>{{ item.location }}</p>
+            <p class="meta"><span class="meta-icon" aria-hidden="true">&#128197;</span>{{ item.date_found|days_ago }}</p>
+            <a href="{{ url_for('item_detail', id=item.id) }}" class="btn btn-block">
                 {% if current_type == 'found' %}Is this yours?{% else %}I found this!{% endif %}
             </a>
         </div>
     </div>
     {% else %}
-        <p>No items found matching your criteria in this category.</p>
+        <div class="empty-state">
+            <span class="empty-emoji" aria-hidden="true">{% if query or current_category %}&#128269;{% else %}&#128230;{% endif %}</span>
+            <strong>No items found</strong>
+            {% if query or current_category %}
+                Nothing matched your filters. Try a different keyword or category, or
+                <a href="{{ url_for('items', type=current_type) }}">clear filters</a>.
+            {% else %}
+                There are no {{ current_type }} items listed right now.
+            {% endif %}
+        </div>
     {% endfor %}
 </div>
-
-<script>
-    function toggleSearch() {
-        var form = document.getElementById('searchForm');
-        var container = document.querySelector('.browse-header');
-        form.classList.toggle('active');
-        container.classList.toggle('search-active');
-    }
-</script>
 {% endblock %}

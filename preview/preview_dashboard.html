@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#25347a">
+    <title>Admin Dashboard &middot; SLHS Lost &amp; Found</title>
+
+    <!-- Google Fonts: Bitter (Regular 400 Italic) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@1,400&display=swap" rel="stylesheet">
+
+    <!-- Cache buster (?v=1.5) to force the newest stylesheet to load -->
+    <link rel="stylesheet" href="static/style.css?v=1.5">
+    <meta name="description" content="Seven Lakes High School Lost and Found System">
+
+    <!-- Theme bootstrap: applies the saved light/dark choice before paint
+         so there is no flash of the wrong theme. -->
+    <script>
+        (function () {
+            try {
+                var saved = localStorage.getItem('slhs-theme');
+                var theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+                document.documentElement.setAttribute('data-theme', theme);
+            } catch (e) {}
+        })();
+    </script>
+</head>
+<body>
+    <!-- Skip link: lets keyboard and screen-reader users jump past the nav -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <header>
+        <nav aria-label="Main navigation">
+            <a href="#" class="logo" aria-label="SLHS Lost and Found, home">
+                <img src="static/logo_icon.png" alt="" class="logo-img">
+                <span>SLHS Lost &amp; Found</span>
+            </a>
+
+            <div class="nav-right">
+                <!-- Desktop Navigation -->
+                <ul class="nav-links desktop-nav">
+                    <li><a href="#" >Home</a></li>
+                    <li><a href="#" >Report</a></li>
+                    <li><a href="#" >Browse</a></li>
+                    
+                        <li><a href="#" aria-current="page">Dashboard</a></li>
+                    
+                </ul>
+
+                <!-- Theme toggle -->
+                <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch color theme" title="Switch light / dark theme">
+                    <span class="theme-icon theme-icon-sun" aria-hidden="true">&#9728;</span>
+                    <span class="theme-icon theme-icon-moon" aria-hidden="true">&#9789;</span>
+                </button>
+
+                <!-- Account area (desktop) -->
+                <div class="nav-account desktop-nav">
+                    
+                        <a href="#" class="btn-nav-text">Log out</a>
+                    
+                </div>
+
+                <!-- Mobile Menu Toggle -->
+                <button class="menu-toggle" id="menuToggle" type="button" aria-label="Open navigation menu" aria-expanded="false" aria-controls="sideMenu">
+                    <span class="menu-bar"></span>
+                    <span class="menu-bar"></span>
+                    <span class="menu-bar"></span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Side Menu Drawer (mobile) -->
+    <aside class="side-menu" id="sideMenu" role="dialog" aria-modal="true" aria-label="Navigation menu" aria-hidden="true">
+        <div class="side-menu-header">
+            <span class="side-menu-title">Menu</span>
+            <button class="close-btn" id="menuClose" type="button" aria-label="Close navigation menu">&times;</button>
+        </div>
+
+        <!-- Account block -->
+        <div class="drawer-account">
+            
+                <div class="drawer-user">
+                    <span class="avatar avatar-lg" aria-hidden="true">A</span>
+                    <div>
+                        <strong>Administrator</strong>
+                        <span class="drawer-role">Admin account</span>
+                    </div>
+                </div>
+                <a href="#" class="btn btn-primary btn-block">Admin Dashboard</a>
+                <a href="#" class="btn btn-outline btn-block">Log out</a>
+            
+        </div>
+
+        <nav class="drawer-links" aria-label="Mobile navigation">
+            <a href="#"><span class="drawer-ico" aria-hidden="true">&#127968;</span> Home</a>
+            <a href="#"><span class="drawer-ico" aria-hidden="true">&#9989;</span> Report Found Item</a>
+            <a href="#"><span class="drawer-ico" aria-hidden="true">&#128269;</span> Report Lost Item</a>
+            <a href="#"><span class="drawer-ico" aria-hidden="true">&#128230;</span> Browse Items</a>
+            <a href="#"><span class="drawer-ico" aria-hidden="true">&#9990;</span> Contact</a>
+        </nav>
+
+        <button class="drawer-theme" id="drawerThemeToggle" type="button">
+            <span class="drawer-ico" aria-hidden="true">&#9789;</span>
+            <span data-theme-label>Switch theme</span>
+        </button>
+    </aside>
+
+    <!-- Menu Overlay -->
+    <div class="menu-overlay" id="menuOverlay" aria-hidden="true"></div>
+
+    <main id="main-content">
+        <!-- Flash Messages -->
+        
+            
+        
+
+        
+<h1>Admin Dashboard</h1>
+<p class="section-intro">Review submissions, approve listings, and manage claims.</p>
+
+<!-- Summary stats -->
+<div class="dash-stats">
+    <div class="stat-card is-warning">
+        <span class="stat-number">2</span>
+        <span class="stat-label">Pending approval</span>
+    </div>
+    <div class="stat-card is-claims">
+        <span class="stat-number">1</span>
+        <span class="stat-label">Active claims</span>
+    </div>
+    <div class="stat-card is-found">
+        <span class="stat-number">6</span>
+        <span class="stat-label">Live found items</span>
+    </div>
+    <div class="stat-card is-lost">
+        <span class="stat-number">3</span>
+        <span class="stat-label">Active lost reports</span>
+    </div>
+</div>
+
+<!-- Pending Approval Section -->
+<div class="dash-section">
+    <div class="dash-section-head">
+        <h2 class="h-amber">Pending Approval</h2>
+        <span class="count-chip">2</span>
+    </div>
+    <p class="section-intro">New submissions waiting for review. Approve to publish, or remove.</p>
+    <table class="admin-table" style="border-top: 3px solid #e0a800;">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Item</th>
+                <th>Type</th>
+                <th>Reporter (Private)</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+            <tr>
+                <td data-label="ID:">8</td>
+                <td data-label="Item:">Black North Face Jacket</td>
+                <td data-label="Type:">
+                    
+                        <span class="badge badge-found">Found</span>
+                    
+                </td>
+                <td data-label="Reporter:" style="color: var(--muted);">Jane Doe - K1234567</td>
+                <td data-label="Actions:">
+                    <button class="btn btn-preview"
+                            data-title="Black North Face Jacket"
+                            data-desc="Found near the main entrance. Has a small sticker on the side and looks gently used."
+                            data-location="Gym Locker Room"
+                            data-date="2026-06-08"
+                            data-contact="Jane Doe - K1234567"
+                            data-img="16adc4f2f5704ea6a00cca5f36a7bc3b_Jacket.jpg">
+                        Preview
+                    </button>
+                    <a href="#" class="btn btn-primary">Approve</a>
+                    <a href="#" class="btn btn-danger js-confirm" data-confirm="Delete this submission?">Remove</a>
+                </td>
+            </tr>
+            
+            <tr>
+                <td data-label="ID:">9</td>
+                <td data-label="Item:">Blue Lunch Box</td>
+                <td data-label="Type:">
+                    
+                        <span class="badge badge-lost">Lost</span>
+                    
+                </td>
+                <td data-label="Reporter:" style="color: var(--muted);">Jane Doe - K1234568</td>
+                <td data-label="Actions:">
+                    <button class="btn btn-preview"
+                            data-title="Blue Lunch Box"
+                            data-desc="Found near the main entrance. Has a small sticker on the side and looks gently used."
+                            data-location="Room 214"
+                            data-date="2026-06-09"
+                            data-contact="Jane Doe - K1234568"
+                            data-img="443eb9ee352a46e7860402ba28bc5091_Lunch_Box.jpeg">
+                        Preview
+                    </button>
+                    <a href="#" class="btn btn-primary">Approve</a>
+                    <a href="#" class="btn btn-danger js-confirm" data-confirm="Delete this submission?">Remove</a>
+                </td>
+            </tr>
+            
+        </tbody>
+    </table>
+</div>
+
+<!-- Active Claims/Inquiries Section -->
+<div class="dash-section">
+    <div class="dash-section-head">
+        <h2 class="h-amber">Active Inquiries / Claims</h2>
+        <span class="count-chip">1</span>
+    </div>
+    <p class="section-intro">
+        People who found lost items or are claiming found items appear here.
+    </p>
+    
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>Item Title (ID)</th>
+                <th>Submitter Info</th>
+                <th>Message / Proof</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+            <tr>
+                <td data-label="Item:">
+                    <strong>TI-84 Plus CE Calculator</strong><br>
+                    <small>Item ID: 2</small>
+                </td>
+                <td data-label="Submitter:">
+                    <strong>Alex Rivera</strong><br>
+                    alex@example.com
+                </td>
+                <td data-label="Message:">It has my initials A.R. on the back and a cracked corner.</td>
+                <td data-label="Actions:">
+                    <a href="#" class="btn btn-danger js-confirm" data-confirm="Dismiss this message?">Dismiss</a>
+                </td>
+            </tr>
+            
+        </tbody>
+    </table>
+    
+</div>
+
+<!-- Live Found Items Section -->
+<div class="dash-section">
+    <div class="dash-section-head">
+        <h2>Live Found Items</h2>
+        <span class="count-chip">6</span>
+    </div>
+    <p class="section-intro">Approved found items currently visible to students on the public site.</p>
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Item</th>
+                <th>Finder Info (Private)</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+            <tr>
+                <td data-label="ID:">1</td>
+                <td data-label="Item:">Owala Water Bottle</td>
+                <td data-label="Finder:" style="color: var(--muted);">Jane Doe - K1234560</td>
+                <td data-label="Status:"><span class="status-pill live">Live</span></td>
+                <td data-label="Actions:">
+                    <button class="btn btn-preview"
+                            data-title="Owala Water Bottle"
+                            data-desc="Found near the main entrance. Has a small sticker on the side and looks gently used."
+                            data-location="Cafeteria"
+                            data-date="2026-06-01"
+                            data-contact="Jane Doe - K1234560"
+                            data-img="16adc4f2f5704ea6a00cca5f36a7bc3b_Jacket.jpg">
+                        Preview
+                    </button>
+                    <a href="#" class="btn btn-danger js-confirm" data-confirm="Delete this item (and all its claims)?">Remove</a>
+                </td>
+            </tr>
+            
+            <tr>
+                <td data-label="ID:">2</td>
+                <td data-label="Item:">TI-84 Plus CE Calculator</td>
+                <td data-label="Finder:" style="color: var(--muted);">Jane Doe - K1234561</td>
+                <td data-label="Status:"><span class="status-pill live">Live</span></td>
+                <td data-label="Actions:">
+                    <button class="btn btn-preview"
+                            data-title="TI-84 Plus CE Calculator"
+                            data-desc="Found near the main entrance. Has a small sticker on the side and looks gently used."
+                            data-location="Library 2nd Floor"
+                            data-date="2026-06-02"
+                            data-contact="Jane Doe - K1234561"
+                            data-img="443eb9ee352a46e7860402ba28bc5091_Lunch_Box.jpeg">
+                        Preview
+                    </button>
+                    <a href="#" class="btn btn-danger js-confirm" data-confirm="Delete this item (and all its claims)?">Remove</a>
+                </td>
+            </tr>
+            
+            <tr>
+                <td data-label="ID:">3</td>
+                <td data-label="Item:">Black North Face Jacket</td>
+                <td data-label="Finder:" style="color: var(--muted);">Jane Doe - K1234562</td>
+                <td data-label="Status:"><span class="status-pill live">Live</span></td>
+                <td data-label="Actions:">
+                    <button class="btn btn-preview"
+                            data-title="Black North Face Jacket"
+                            data-desc="Found near the main entrance. Has a small sticker on the side and looks gently used."
+                            data-location="Gym Locker Room"
+                            data-date="2026-06-03"
+                            data-contact="Jane Doe - K1234562"
+                            data-img="82e2688105f6459da983ba932f6ac60f_IMG_3757.jpg">
+                        Preview
+                    </button>
+                    <a href="#" class="btn btn-danger js-confirm" data-confirm="Delete this item (and all its claims)?">Remove</a>
+                </td>
+            </tr>
+            
+            <tr>
+                <td data-label="ID:">4</td>
+                <td data-label="Item:">Blue Lunch Box</td>
+                <td data-label="Finder:" style="color: var(--muted);">Jane Doe - K1234563</td>
+                <td data-label="Status:"><span class="status-pill live">Live</span></td>
+                <td data-label="Actions:">
+                    <button class="btn btn-preview"
+                            data-title="Blue Lunch Box"
+                            data-desc="Found near the main entrance. Has a small sticker on the side and looks gently used."
+                            data-location="Room 214"
+                            data-date="2026-06-04"
+                            data-contact="Jane Doe - K1234563"
+                            data-img="8f3a77cf22d749a2812023d901332a4c_Pencil_Bag.webp">
+                        Preview
+                    </button>
+                    <a href="#" class="btn btn-danger js-confirm" data-confirm="Delete this item (and all its claims)?">Remove</a>
+                </td>
+            </tr>
+            
+            <tr>
+                <td data-label="ID:">5</td>
+                <td data-label="Item:">Floral Pencil Bag</td>
+                <td data-label="Finder:" style="color: var(--muted);">Jane Doe - K1234564</td>
+                <td data-label="Status:"><span class="status-pill live">Live</span></td>
+                <td data-label="Actions:">
+                    <button class="btn btn-preview"
+                            data-title="Floral Pencil Bag"
+                            data-desc="Found near the main entrance. Has a small sticker on the side and looks gently used."
+                            data-location="Bus Loop"
+                            data-date="2026-06-05"
+                            data-contact="Jane Doe - K1234564"
+                            data-img="af555b99797f45ab97dda36188c949f9_Owala_Water_Bottle.webp">
+                        Preview
+                    </button>
+                    <a href="#" class="btn btn-danger js-confirm" data-confirm="Delete this item (and all its claims)?">Remove</a>
+                </td>
+            </tr>
+            
+            <tr>
+                <td data-label="ID:">6</td>
+                <td data-label="Item:">Owala Water Bottle</td>
+                <td data-label="Finder:" style="color: var(--muted);">Jane Doe - K1234565</td>
+                <td data-label="Status:"><span class="status-pill live">Live</span></td>
+                <td data-label="Actions:">
+                    <button class="btn btn-preview"
+                            data-title="Owala Water Bottle"
+                            data-desc="Found near the main entrance. Has a small sticker on the side and looks gently used."
+                            data-location="Cafeteria"
+                            data-date="2026-06-06"
+                            data-contact="Jane Doe - K1234565"
+                            data-img="d5afd244ec6446a4bcc0a4559b32aacf_Owala_Water_Bottle.webp">
+                        Preview
+                    </button>
+                    <a href="#" class="btn btn-danger js-confirm" data-confirm="Delete this item (and all its claims)?">Remove</a>
+                </td>
+            </tr>
+            
+        </tbody>
+    </table>
+</div>
+
+<!-- Live Lost Reports Section -->
+<div class="dash-section">
+    <div class="dash-section-head">
+        <h2 class="h-lost">Live Lost Reports</h2>
+        <span class="count-chip">3</span>
+    </div>
+    <p class="section-intro">Approved lost reports currently visible in the "Looking For" tab.</p>
+    <table class="admin-table" style="border-top: 3px solid var(--accent);">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Item</th>
+                <th>Owner Info (Private)</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+            <tr>
+                <td data-label="ID:">1</td>
+                <td data-label="Item:">Owala Water Bottle</td>
+                <td data-label="Owner:" style="color: var(--muted);">Jane Doe - K1234560</td>
+                <td data-label="Status:"><span class="status-pill searching">Searching</span></td>
+                <td data-label="Actions:">
+                    <button class="btn btn-preview"
+                            data-title="Owala Water Bottle"
+                            data-desc="Found near the main entrance. Has a small sticker on the side and looks gently used."
+                            data-location="Cafeteria"
+                            data-date="2026-06-01"
+                            data-contact="Jane Doe - K1234560"
+                            data-img="16adc4f2f5704ea6a00cca5f36a7bc3b_Jacket.jpg">
+                        Preview
+                    </button>
+                    <a href="#" class="btn btn-danger js-confirm" data-confirm="Delete this lost report?">Remove</a>
+                </td>
+            </tr>
+            
+            <tr>
+                <td data-label="ID:">2</td>
+                <td data-label="Item:">TI-84 Plus CE Calculator</td>
+                <td data-label="Owner:" style="color: var(--muted);">Jane Doe - K1234561</td>
+                <td data-label="Status:"><span class="status-pill searching">Searching</span></td>
+                <td data-label="Actions:">
+                    <button class="btn btn-preview"
+                            data-title="TI-84 Plus CE Calculator"
+                            data-desc="Found near the main entrance. Has a small sticker on the side and looks gently used."
+                            data-location="Library 2nd Floor"
+                            data-date="2026-06-02"
+                            data-contact="Jane Doe - K1234561"
+                            data-img="443eb9ee352a46e7860402ba28bc5091_Lunch_Box.jpeg">
+                        Preview
+                    </button>
+                    <a href="#" class="btn btn-danger js-confirm" data-confirm="Delete this lost report?">Remove</a>
+                </td>
+            </tr>
+            
+            <tr>
+                <td data-label="ID:">3</td>
+                <td data-label="Item:">Black North Face Jacket</td>
+                <td data-label="Owner:" style="color: var(--muted);">Jane Doe - K1234562</td>
+                <td data-label="Status:"><span class="status-pill searching">Searching</span></td>
+                <td data-label="Actions:">
+                    <button class="btn btn-preview"
+                            data-title="Black North Face Jacket"
+                            data-desc="Found near the main entrance. Has a small sticker on the side and looks gently used."
+                            data-location="Gym Locker Room"
+                            data-date="2026-06-03"
+                            data-contact="Jane Doe - K1234562"
+                            data-img="82e2688105f6459da983ba932f6ac60f_IMG_3757.jpg">
+                        Preview
+                    </button>
+                    <a href="#" class="btn btn-danger js-confirm" data-confirm="Delete this lost report?">Remove</a>
+                </td>
+            </tr>
+            
+        </tbody>
+    </table>
+</div>
+
+<!-- Preview Modal -->
+<div id="previewModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modalTitle">Item Title</h2>
+            <button type="button" class="close-modal" aria-label="Close preview">&times;</button>
+        </div>
+        <div class="modal-body">
+            <img id="modalImg" src="" alt="Photo of the reported item" class="modal-preview-img" style="display:none;">
+            
+            <span class="modal-label">Description:</span>
+            <p id="modalDesc"></p>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px;">
+                <div>
+                    <span class="modal-label">Location Found:</span>
+                    <p id="modalLoc"></p>
+                </div>
+                <div>
+                    <span class="modal-label">Date Found:</span>
+                    <p id="modalDate"></p>
+                </div>
+            </div>
+
+            <div style="margin-top: 15px; padding: 10px; background-color: #ffeeba; border-radius: 4px;">
+                <span class="modal-label" style="color: #856404; margin-top: 0;">Reporter's Info (Private):</span>
+                <p id="modalContact" style="font-weight: bold; color: #333;"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 Seven Lakes High School Lost &amp; Found System</p>
+        <nav class="footer-links" aria-label="Footer">
+            <a href="#">Contact Us</a>
+            <span class="separator" aria-hidden="true">|</span>
+            <a href="#">Legal &amp; Privacy</a>
+            <span class="separator" aria-hidden="true">|</span>
+            <a href="#">Sources &amp; Credits</a>
+        </nav>
+    </footer>
+
+    <!-- Back to top -->
+    <button class="back-to-top" id="backToTop" type="button" aria-label="Back to top">&#8593;</button>
+
+    <!-- Site-wide scripts (kept in a separate file to fully separate languages) -->
+    <script src="static/script.js?v=1.5" defer></script>
+    
+</body>
+</html>

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#25347a">
+    <title>Report an Item &middot; SLHS Lost &amp; Found</title>
+
+    <!-- Google Fonts: Bitter (Regular 400 Italic) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@1,400&display=swap" rel="stylesheet">
+
+    <!-- Cache buster (?v=1.5) to force the newest stylesheet to load -->
+    <link rel="stylesheet" href="static/style.css?v=1.5">
+    <meta name="description" content="Seven Lakes High School Lost and Found System">
+
+    <!-- Theme bootstrap: applies the saved light/dark choice before paint
+         so there is no flash of the wrong theme. -->
+    <script>
+        (function () {
+            try {
+                var saved = localStorage.getItem('slhs-theme');
+                var theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+                document.documentElement.setAttribute('data-theme', theme);
+            } catch (e) {}
+        })();
+    </script>
+</head>
+<body>
+    <!-- Skip link: lets keyboard and screen-reader users jump past the nav -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <header>
+        <nav aria-label="Main navigation">
+            <a href="#" class="logo" aria-label="SLHS Lost and Found, home">
+                <img src="static/logo_icon.png" alt="" class="logo-img">
+                <span>SLHS Lost &amp; Found</span>
+            </a>
+
+            <div class="nav-right">
+                <!-- Desktop Navigation -->
+                <ul class="nav-links desktop-nav">
+                    <li><a href="#" >Home</a></li>
+                    <li><a href="#" aria-current="page">Report</a></li>
+                    <li><a href="#" >Browse</a></li>
+                    
+                </ul>
+
+                <!-- Theme toggle -->
+                <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch color theme" title="Switch light / dark theme">
+                    <span class="theme-icon theme-icon-sun" aria-hidden="true">&#9728;</span>
+                    <span class="theme-icon theme-icon-moon" aria-hidden="true">&#9789;</span>
+                </button>
+
+                <!-- Account area (desktop) -->
+                <div class="nav-account desktop-nav">
+                    
+                        <a href="#" class="account-chip" >
+                            <span class="avatar" aria-hidden="true">J</span>
+                            <span>Jane</span>
+                        </a>
+                        <a href="#" class="btn-nav-text">Log out</a>
+                    
+                </div>
+
+                <!-- Mobile Menu Toggle -->
+                <button class="menu-toggle" id="menuToggle" type="button" aria-label="Open navigation menu" aria-expanded="false" aria-controls="sideMenu">
+                    <span class="menu-bar"></span>
+                    <span class="menu-bar"></span>
+                    <span class="menu-bar"></span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Side Menu Drawer (mobile) -->
+    <aside class="side-menu" id="sideMenu" role="dialog" aria-modal="true" aria-label="Navigation menu" aria-hidden="true">
+        <div class="side-menu-header">
+            <span class="side-menu-title">Menu</span>
+            <button class="close-btn" id="menuClose" type="button" aria-label="Close navigation menu">&times;</button>
+        </div>
+
+        <!-- Account block -->
+        <div class="drawer-account">
+            
+                <div class="drawer-user">
+                    <span class="avatar avatar-lg" aria-hidden="true">J</span>
+                    <div>
+                        <strong>Jane Doe</strong>
+                        <span class="drawer-role">Student account</span>
+                    </div>
+                </div>
+                <a href="#" class="btn btn-primary btn-block">My Account</a>
+                <a href="#" class="btn btn-outline btn-block">Log out</a>
+            
+        </div>
+
+        <nav class="drawer-links" aria-label="Mobile navigation">
+            <a href="#"><span class="drawer-ico" aria-hidden="true">&#127968;</span> Home</a>
+            <a href="#"><span class="drawer-ico" aria-hidden="true">&#9989;</span> Report Found Item</a>
+            <a href="#"><span class="drawer-ico" aria-hidden="true">&#128269;</span> Report Lost Item</a>
+            <a href="#"><span class="drawer-ico" aria-hidden="true">&#128230;</span> Browse Items</a>
+            <a href="#"><span class="drawer-ico" aria-hidden="true">&#9990;</span> Contact</a>
+        </nav>
+
+        <button class="drawer-theme" id="drawerThemeToggle" type="button">
+            <span class="drawer-ico" aria-hidden="true">&#9789;</span>
+            <span data-theme-label>Switch theme</span>
+        </button>
+    </aside>
+
+    <!-- Menu Overlay -->
+    <div class="menu-overlay" id="menuOverlay" aria-hidden="true"></div>
+
+    <main id="main-content">
+        <!-- Flash Messages -->
+        
+            
+        
+
+        
+<div class="form-container">
+    <h2>Submit an Item Report</h2>
+    <p class="section-intro">Fill out the details below so we can track the item and help reunite it with its owner.</p>
+
+    
+    <div class="prefill-note">
+        <span aria-hidden="true">&#9989;</span>
+        <span>Signed in as <strong>Jane Doe</strong> &mdash; your name and ID are filled in automatically.</span>
+    </div>
+    
+
+    <form method="post" enctype="multipart/form-data">
+
+        <div class="form-group" style="background-color: var(--bg-tint); padding: 16px; border-radius: var(--radius-sm); border-left: 4px solid var(--secondary);">
+            <label for="report_type">I am reporting an item that I:</label>
+            <select name="report_type" id="report_type" required>
+                <option value="found" selected>Found (I have it or turned it in)</option>
+                <option value="lost" >Lost (I am looking for it)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="title" id="title_label">Item Name</label>
+            <input type="text" id="title" name="title" required placeholder="e.g., Water Bottle, Graphing Calculator">
+        </div>
+
+        <div class="form-group">
+            <label for="category">Category</label>
+            <select name="category" id="category" required>
+                
+                    <option value="Electronics" >🔌 Electronics</option>
+                
+                    <option value="Clothing" >👕 Clothing</option>
+                
+                    <option value="Bags & Backpacks" >🎒 Bags & Backpacks</option>
+                
+                    <option value="Water Bottles" >🧴 Water Bottles</option>
+                
+                    <option value="Books & Supplies" >📚 Books & Supplies</option>
+                
+                    <option value="Keys & Wallets" >🔑 Keys & Wallets</option>
+                
+                    <option value="Jewelry & Accessories" >💍 Jewelry & Accessories</option>
+                
+                    <option value="Sports Equipment" >⚽ Sports Equipment</option>
+                
+                    <option value="Other" selected>📦 Other</option>
+                
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Detailed Description</label>
+            <p class="field-hint">The more detail, the easier it is to match. Include brand, color, and any unique marks.</p>
+            <textarea id="description" name="description" rows="4" required placeholder="Brand, contents, color, specific scratches..."></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="location" id="location_label">Location Found</label>
+            <input type="text" id="location" name="location" required placeholder="e.g., Room 104, Cafeteria">
+        </div>
+
+        <div class="form-group">
+            <label for="date_found" id="date_label">Date Found</label>
+            <input type="date" id="date_found" name="date_found" required>
+        </div>
+
+        <div class="form-group">
+            <label for="contact_info">Your Full Name &amp; ID Number (Private)</label>
+            <p class="field-hint">This is only seen by the admin to verify records &mdash; it is never shown publicly.</p>
+            <input type="text" id="contact_info" name="contact_info" required placeholder="e.g., Jane Doe - K1234567"
+                   value="Jane Doe - K1234567">
+        </div>
+
+        <div class="form-group" id="image_group">
+            <label for="image">Upload Photo <span style="font-weight:400; color:var(--muted);">(highly recommended for found items)</span></label>
+            <input type="file" id="image" name="image" accept="image/*">
+            <img id="imagePreview" class="image-preview" alt="Preview of the photo you selected">
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block btn-lg">Submit Report</button>
+    </form>
+</div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 Seven Lakes High School Lost &amp; Found System</p>
+        <nav class="footer-links" aria-label="Footer">
+            <a href="#">Contact Us</a>
+            <span class="separator" aria-hidden="true">|</span>
+            <a href="#">Legal &amp; Privacy</a>
+            <span class="separator" aria-hidden="true">|</span>
+            <a href="#">Sources &amp; Credits</a>
+        </nav>
+    </footer>
+
+    <!-- Back to top -->
+    <button class="back-to-top" id="backToTop" type="button" aria-label="Back to top">&#8593;</button>
+
+    <!-- Site-wide scripts (kept in a separate file to fully separate languages) -->
+    <script src="static/script.js?v=1.5" defer></script>
+    
+</body>
+</html>

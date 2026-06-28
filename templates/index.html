@@ -1,35 +1,75 @@
 {% extends 'base.html' %}
 
+{% block title %}Home &middot; SLHS Lost &amp; Found{% endblock %}
+
 {% block content %}
-<div style="text-align: center; padding: 3rem 0;">
-    <h1>Welcome to the SLHS Lost & Found</h1>
-    <p style="margin: 1rem 0 2rem 0; font-size: 1.1rem;">
-        Did you lose something? Or did you find something that isn't yours?<br>
-    </p>
-    <div>
-        <a href="{{ url_for('report', type='found') }}" class="btn">I Found Something</a>
-        <a href="{{ url_for('report', type='lost') }}" class="btn" style="background-color: #c7470c; margin-left: 10px;">I Lost Something</a>
+<section class="hero">
+    <h1>SLHS Lost &amp; Found</h1>
+    <p>Lost something on campus, or found an item that isn't yours? Report it, search the listings, and help get belongings back to their owners.</p>
+    <div class="hero-actions">
+        <a href="{{ url_for('report', type='found') }}" class="btn btn-on-hero btn-lg">I Found Something</a>
+        <a href="{{ url_for('report', type='lost') }}" class="btn btn-hero-ghost btn-lg">I Lost Something</a>
+        <a href="{{ url_for('items') }}" class="btn btn-hero-ghost btn-lg">Browse Items</a>
+    </div>
+    <div class="hero-stats">
+        <div class="hero-stat">
+            <span class="num">{{ found_count }}</span>
+            <span class="lbl">Found items listed</span>
+        </div>
+        <div class="hero-stat">
+            <span class="num">{{ lost_count }}</span>
+            <span class="lbl">Lost item reports</span>
+        </div>
+    </div>
+</section>
+
+<h2>How It Works</h2>
+<div class="how-it-works">
+    <div class="how-step reveal">
+        <span class="step-number" aria-hidden="true">1</span>
+        <h3>Report</h3>
+        <p>Found something, or lost something? Fill out a quick form and add a photo so it's easy to recognize.</p>
+    </div>
+    <div class="how-step reveal">
+        <span class="step-number" aria-hidden="true">2</span>
+        <h3>Browse &amp; Search</h3>
+        <p>Look through approved listings or search by keyword, location, or date to find your item.</p>
+    </div>
+    <div class="how-step reveal">
+        <span class="step-number" aria-hidden="true">3</span>
+        <h3>Claim &amp; Collect</h3>
+        <p>Submit a claim with proof of ownership. An office admin verifies it and arranges the return.</p>
     </div>
 </div>
 
 <h2>Recently Found Items</h2>
+<p class="section-intro">The latest items turned in and waiting to be claimed.</p>
 <div class="item-grid">
     {% for item in items %}
-    <div class="item-card">
-        {% if item.image_file %}
-            <img src="{{ url_for('static', filename='uploads/' + item.image_file) }}" alt="Photo of {{ item.title }}" class="item-image">
-        {% else %}
-            <div class="item-image" style="display:flex;align-items:center;justify-content:center;color:#888;">No Photo</div>
-        {% endif %}
+    <div class="item-card reveal">
+        <div class="item-image-wrap">
+            <span class="badge badge-found card-badge">Found</span>
+            {% if item.image_file %}
+                <img src="{{ url_for('static', filename='uploads/' + item.image_file) }}" alt="Photo of {{ item.title }}" class="item-image" loading="lazy">
+            {% else %}
+                <div class="item-image placeholder">No Photo</div>
+            {% endif %}
+        </div>
         <div class="item-details">
+            <span class="cat-chip">{{ item.category|category_icon }} {{ item.category }}</span>
             <h3 class="item-title">{{ item.title }}</h3>
-            <p class="meta">Found at: {{ item.location }}</p>
-            <p class="meta">Date: {{ item.date_found }}</p>
-            <a href="{{ url_for('item_detail', id=item.id) }}" class="btn" style="padding: 5px 10px; font-size: 0.9rem;">View Details</a>
+            <p class="meta"><span class="meta-icon" aria-hidden="true">&#128205;</span>{{ item.location }}</p>
+            <p class="meta"><span class="meta-icon" aria-hidden="true">&#128197;</span>{{ item.date_found|days_ago }}</p>
+            <a href="{{ url_for('item_detail', id=item.id) }}" class="btn btn-block">View Details</a>
         </div>
     </div>
     {% else %}
-        <p>No recently found items reported.</p>
+        <div class="empty-state">
+            <span class="empty-emoji" aria-hidden="true">&#128230;</span>
+            <strong>Nothing here yet</strong>
+            Found items will appear here once an admin approves them.
+            <div style="margin-top:1rem;"><a href="{{ url_for('report', type='found') }}" class="btn btn-primary">Report a Found Item</a></div>
+        </div>
     {% endfor %}
 </div>
 {% endblock %}

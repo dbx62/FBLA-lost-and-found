@@ -1,13 +1,90 @@
 {% extends 'base.html' %}
 
+{% block title %}Admin Dashboard &middot; SLHS Lost &amp; Found{% endblock %}
+
 {% block content %}
 <h1>Admin Dashboard</h1>
+<p class="section-intro">Review submissions, approve listings, and manage claims.</p>
+
+<!-- Summary stats -->
+<div class="dash-stats">
+    <div class="stat-card is-warning">
+        <span class="stat-number">{{ pending_found|length + pending_lost|length }}</span>
+        <span class="stat-label">Pending approval</span>
+    </div>
+    <div class="stat-card is-claims">
+        <span class="stat-number">{{ claims|length }}</span>
+        <span class="stat-label">Active claims</span>
+    </div>
+    <div class="stat-card is-found">
+        <span class="stat-number">{{ live_found|length }}</span>
+        <span class="stat-label">Live found items</span>
+    </div>
+    <div class="stat-card is-lost">
+        <span class="stat-number">{{ active_lost|length }}</span>
+        <span class="stat-label">Active lost reports</span>
+    </div>
+</div>
+
+<!-- Pending Approval Section -->
+<div class="dash-section">
+    <div class="dash-section-head">
+        <h2 class="h-amber">Pending Approval</h2>
+        <span class="count-chip">{{ pending_found|length + pending_lost|length }}</span>
+    </div>
+    <p class="section-intro">New submissions waiting for review. Approve to publish, or remove.</p>
+    <table class="admin-table" style="border-top: 3px solid #e0a800;">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Item</th>
+                <th>Type</th>
+                <th>Reporter (Private)</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in pending_found + pending_lost %}
+            <tr>
+                <td data-label="ID:">{{ item.id }}</td>
+                <td data-label="Item:">{{ item.title }}</td>
+                <td data-label="Type:">
+                    {% if item.report_type == 'lost' %}
+                        <span class="badge badge-lost">Lost</span>
+                    {% else %}
+                        <span class="badge badge-found">Found</span>
+                    {% endif %}
+                </td>
+                <td data-label="Reporter:" style="color: var(--muted);">{{ item.contact_info }}</td>
+                <td data-label="Actions:">
+                    <button class="btn btn-preview"
+                            data-title="{{ item.title }}"
+                            data-desc="{{ item.description }}"
+                            data-location="{{ item.location }}"
+                            data-date="{{ item.date_found }}"
+                            data-contact="{{ item.contact_info }}"
+                            data-img="{{ item.image_file or '' }}">
+                        Preview
+                    </button>
+                    <a href="{{ url_for('approve', id=item.id) }}" class="btn btn-primary">Approve</a>
+                    <a href="{{ url_for('delete', id=item.id) }}" class="btn btn-danger js-confirm" data-confirm="Delete this submission?">Remove</a>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5">Nothing waiting for approval. You're all caught up.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
 <!-- Active Claims/Inquiries Section -->
-<div style="margin-top: 2rem; background: #fff3cd; padding: 15px; border-radius: 8px; border: 1px solid #ffeeba;">
-    <h2 style="color: #856404;">Active Inquiries / Claims</h2>
-    <p style="font-size: 0.9rem; margin-bottom: 10px;">
-        Review these responses. People who found lost items or are claiming found items appear here.
+<div class="dash-section">
+    <div class="dash-section-head">
+        <h2 class="h-amber">Active Inquiries / Claims</h2>
+        <span class="count-chip">{{ claims|length }}</span>
+    </div>
+    <p class="section-intro">
+        People who found lost items or are claiming found items appear here.
     </p>
     {% if claims %}
     <table class="admin-table">
@@ -32,7 +109,7 @@
                 </td>
                 <td data-label="Message:">{{ claim.proof_description }}</td>
                 <td data-label="Actions:">
-                    <a href="{{ url_for('delete_claim', id=claim.id) }}" class="btn btn-danger" onclick="return confirm('Dismiss this message?')">Dismiss</a>
+                    <a href="{{ url_for('delete_claim', id=claim.id) }}" class="btn btn-danger js-confirm" data-confirm="Dismiss this message?">Dismiss</a>
                 </td>
             </tr>
             {% endfor %}
@@ -44,9 +121,12 @@
 </div>
 
 <!-- Live Found Items Section -->
-<div style="margin-top: 3rem;">
-    <h2 style="color: var(--secondary);">Live Found Items</h2>
-    <p style="font-size: 0.9rem; margin-bottom: 10px;">Approved found items that are currently visible to students on the public site.</p>
+<div class="dash-section">
+    <div class="dash-section-head">
+        <h2>Live Found Items</h2>
+        <span class="count-chip">{{ live_found|length }}</span>
+    </div>
+    <p class="section-intro">Approved found items currently visible to students on the public site.</p>
     <table class="admin-table">
         <thead>
             <tr>
@@ -62,8 +142,8 @@
             <tr>
                 <td data-label="ID:">{{ item.id }}</td>
                 <td data-label="Item:">{{ item.title }}</td>
-                <td data-label="Finder:" style="color: #666;">{{ item.contact_info }}</td>
-                <td data-label="Status:"><span style="background: #d4edda; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem;">Live</span></td>
+                <td data-label="Finder:" style="color: var(--muted);">{{ item.contact_info }}</td>
+                <td data-label="Status:"><span class="status-pill live">Live</span></td>
                 <td data-label="Actions:">
                     <button class="btn btn-preview"
                             data-title="{{ item.title }}"
@@ -71,11 +151,10 @@
                             data-location="{{ item.location }}"
                             data-date="{{ item.date_found }}"
                             data-contact="{{ item.contact_info }}"
-                            data-img="{{ item.image_file or '' }}"
-                            onclick="openPreview(this)">
+                            data-img="{{ item.image_file or '' }}">
                         Preview
                     </button>
-                    <a href="{{ url_for('delete', id=item.id) }}" class="btn btn-danger" onclick="return confirm('Delete this item (and all its claims)?')">Remove</a>
+                    <a href="{{ url_for('delete', id=item.id) }}" class="btn btn-danger js-confirm" data-confirm="Delete this item (and all its claims)?">Remove</a>
                 </td>
             </tr>
             {% else %}
@@ -86,9 +165,12 @@
 </div>
 
 <!-- Live Lost Reports Section -->
-<div style="margin-top: 3rem;">
-    <h2 style="color: var(--accent);">Live Lost Reports</h2>
-    <p style="font-size: 0.9rem; margin-bottom: 10px;">Approved lost reports currently visible in the "Looking For" tab.</p>
+<div class="dash-section">
+    <div class="dash-section-head">
+        <h2 class="h-lost">Live Lost Reports</h2>
+        <span class="count-chip">{{ active_lost|length }}</span>
+    </div>
+    <p class="section-intro">Approved lost reports currently visible in the "Looking For" tab.</p>
     <table class="admin-table" style="border-top: 3px solid var(--accent);">
         <thead>
             <tr>
@@ -104,8 +186,8 @@
             <tr>
                 <td data-label="ID:">{{ item.id }}</td>
                 <td data-label="Item:">{{ item.title }}</td>
-                <td data-label="Owner:" style="color: #666;">{{ item.contact_info }}</td>
-                <td data-label="Status:"><span style="background: #ffeeba; color: #856404; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem;">Searching</span></td>
+                <td data-label="Owner:" style="color: var(--muted);">{{ item.contact_info }}</td>
+                <td data-label="Status:"><span class="status-pill searching">Searching</span></td>
                 <td data-label="Actions:">
                     <button class="btn btn-preview"
                             data-title="{{ item.title }}"
@@ -113,11 +195,10 @@
                             data-location="{{ item.location }}"
                             data-date="{{ item.date_found }}"
                             data-contact="{{ item.contact_info }}"
-                            data-img="{{ item.image_file or '' }}"
-                            onclick="openPreview(this)">
+                            data-img="{{ item.image_file or '' }}">
                         Preview
                     </button>
-                    <a href="{{ url_for('delete', id=item.id) }}" class="btn btn-danger" onclick="return confirm('Delete this lost report?')">Remove</a>
+                    <a href="{{ url_for('delete', id=item.id) }}" class="btn btn-danger js-confirm" data-confirm="Delete this lost report?">Remove</a>
                 </td>
             </tr>
             {% else %}
@@ -128,14 +209,14 @@
 </div>
 
 <!-- Preview Modal -->
-<div id="previewModal" class="modal">
+<div id="previewModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <div class="modal-content">
         <div class="modal-header">
             <h2 id="modalTitle">Item Title</h2>
-            <span class="close-modal" onclick="closePreview()">&times;</span>
+            <button type="button" class="close-modal" aria-label="Close preview">&times;</button>
         </div>
         <div class="modal-body">
-            <img id="modalImg" src="" alt="Item Image" class="modal-preview-img" style="display:none;">
+            <img id="modalImg" src="" alt="Photo of the reported item" class="modal-preview-img" style="display:none;">
             
             <span class="modal-label">Description:</span>
             <p id="modalDesc"></p>
@@ -158,48 +239,4 @@
         </div>
     </div>
 </div>
-
-<script>
-    var modal = document.getElementById("previewModal");
-    var modalImg = document.getElementById("modalImg");
-    var modalTitle = document.getElementById("modalTitle");
-    var modalDesc = document.getElementById("modalDesc");
-    var modalLoc = document.getElementById("modalLoc");
-    var modalDate = document.getElementById("modalDate");
-    var modalContact = document.getElementById("modalContact");
-
-    function openPreview(btn) {
-        var title = btn.getAttribute('data-title');
-        var desc = btn.getAttribute('data-desc');
-        var loc = btn.getAttribute('data-location');
-        var date = btn.getAttribute('data-date');
-        var contact = btn.getAttribute('data-contact');
-        var imgFile = btn.getAttribute('data-img');
-
-        modalTitle.innerText = title;
-        modalDesc.innerText = desc;
-        modalLoc.innerText = loc;
-        modalDate.innerText = date;
-        modalContact.innerText = contact;
-
-        if (imgFile && imgFile !== 'None' && imgFile !== '') {
-            modalImg.src = "/static/uploads/" + imgFile;
-            modalImg.style.display = "block";
-        } else {
-            modalImg.style.display = "none";
-        }
-
-        modal.style.display = "block";
-    }
-
-    function closePreview() {
-        modal.style.display = "none";
-    }
-
-    window.onclick = function(event) {
-        if (event.target == modal) {
-            modal.style.display = "none";
-        }
-    }
-</script>
 {% endblock %}

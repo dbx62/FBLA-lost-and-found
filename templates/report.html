@@ -1,15 +1,24 @@
 {% extends 'base.html' %}
 
+{% block title %}Report an Item &middot; SLHS Lost &amp; Found{% endblock %}
+
 {% block content %}
 <div class="form-container">
     <h2>Submit an Item Report</h2>
-    <p style="margin-bottom: 1rem; color: #666;">Please fill out the details below so we can track the item.</p>
-    
+    <p class="section-intro">Fill out the details below so we can track the item and help reunite it with its owner.</p>
+
+    {% if current_user and current_user.role == 'student' %}
+    <div class="prefill-note">
+        <span aria-hidden="true">&#9989;</span>
+        <span>Signed in as <strong>{{ current_user.full_name }}</strong> &mdash; your name and ID are filled in automatically.</span>
+    </div>
+    {% endif %}
+
     <form method="post" enctype="multipart/form-data">
-        
-        <div class="form-group" style="background-color: #f1f8ff; padding: 15px; border-radius: 8px; border-left: 4px solid var(--secondary);">
+
+        <div class="form-group" style="background-color: var(--bg-tint); padding: 16px; border-radius: var(--radius-sm); border-left: 4px solid var(--secondary);">
             <label for="report_type">I am reporting an item that I:</label>
-            <select name="report_type" id="report_type" required onchange="updateForm()">
+            <select name="report_type" id="report_type" required>
                 <option value="found" {% if current_type == 'found' %}selected{% endif %}>Found (I have it or turned it in)</option>
                 <option value="lost" {% if current_type == 'lost' %}selected{% endif %}>Lost (I am looking for it)</option>
             </select>
@@ -21,7 +30,17 @@
         </div>
 
         <div class="form-group">
+            <label for="category">Category</label>
+            <select name="category" id="category" required>
+                {% for cat in CATEGORIES %}
+                    <option value="{{ cat }}" {% if cat == 'Other' %}selected{% endif %}>{{ cat|category_icon }} {{ cat }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
             <label for="description">Detailed Description</label>
+            <p class="field-hint">The more detail, the easier it is to match. Include brand, color, and any unique marks.</p>
             <textarea id="description" name="description" rows="4" required placeholder="Brand, contents, color, specific scratches..."></textarea>
         </div>
 
@@ -36,91 +55,19 @@
         </div>
 
         <div class="form-group">
-            <label for="contact_info">Your Full Name & ID Number (Private)</label>
-            <p style="font-size:0.8rem; color:#666; margin-bottom:5px;">This is only seen by the Admin to verify records.</p>
-            <input type="text" id="contact_info" name="contact_info" required placeholder="e.g., Jane Doe - K1234567">
+            <label for="contact_info">Your Full Name &amp; ID Number (Private)</label>
+            <p class="field-hint">This is only seen by the admin to verify records &mdash; it is never shown publicly.</p>
+            <input type="text" id="contact_info" name="contact_info" required placeholder="e.g., Jane Doe - K1234567"
+                   value="{% if current_user and current_user.role == 'student' %}{{ current_user.full_name }}{% if current_user.student_id %} - {{ current_user.student_id }}{% endif %}{% endif %}">
         </div>
 
         <div class="form-group" id="image_group">
-            <label for="image">Upload Photo (Highly recommended if Found)</label>
+            <label for="image">Upload Photo <span style="font-weight:400; color:var(--muted);">(highly recommended for found items)</span></label>
             <input type="file" id="image" name="image" accept="image/*">
+            <img id="imagePreview" class="image-preview" alt="Preview of the photo you selected">
         </div>
 
-        <button type="submit" class="btn">Submit Report</button>
+        <button type="submit" class="btn btn-primary btn-block btn-lg">Submit Report</button>
     </form>
 </div>
-
-<!-- ==========================================
-     DYNAMIC FORM & MULTI-STEP DEMO SCRIPT
-     ========================================== -->
-<script>
-    function updateForm() {
-        var type = document.getElementById('report_type').value;
-        var locLabel = document.getElementById('location_label');
-        var dateLabel = document.getElementById('date_label');
-        var imgGroup = document.getElementById('image_group');
-        var descInput = document.getElementById('description');
-
-        if (type === 'lost') {
-            locLabel.innerText = 'Last Known Location (Where did you leave it?)';
-            dateLabel.innerText = 'Date Lost (When did you last have it?)';
-            imgGroup.style.display = 'none';
-            descInput.placeholder = "Brand, color, identifiable marks...";
-        } else {
-            locLabel.innerText = 'Location Found (Where did you find it?)';
-            dateLabel.innerText = 'Date Found (When did you find it?)';
-            imgGroup.style.display = 'block';
-            descInput.placeholder = "Brand, contents, color, specific scratches...";
-        }
-    }
-
-    document.addEventListener("DOMContentLoaded", updateForm);
-
-    let demoStep = 0;
-    let isTyping = false;
-
-    document.addEventListener('keydown', function(e) {
-        if ((e.key === 'PageDown' || (e.altKey && e.key === 'd')) && !isTyping) {
-            e.preventDefault(); 
-            const demoTitle = "Texas Instruments TI-84 Plus CE";
-            const demoDesc = "Black graphing calculator with a blue case. Has a small FBLA sticker on the back cover and is missing the battery door.";
-            const demoLoc = "Library - 2nd Floor Study Tables";
-            const demoContact = "Aditya Aggarwal - 1424500"; 
-
-            if (demoStep === 0) {
-                isTyping = true;
-                document.getElementById('report_type').value = 'found';
-                updateForm();
-                typeText('title', demoTitle, 30, () => { isTyping = false; demoStep++; });
-            } else if (demoStep === 1) {
-                isTyping = true;
-                typeText('description', demoDesc, 15, () => { isTyping = false; demoStep++; });
-            } else if (demoStep === 2) {
-                isTyping = true;
-                typeText('location', demoLoc, 30, () => { isTyping = false; demoStep++; });
-            } else if (demoStep === 3) {
-                let today = new Date().toISOString().split('T')[0];
-                document.getElementById('date_found').value = today;
-                demoStep++;
-            } else if (demoStep === 4) {
-                isTyping = true;
-                typeText('contact_info', demoContact, 30, () => { isTyping = false; demoStep++; });
-            }
-        }
-    });
-
-    function typeText(elementId, text, speed, callback) {
-        const el = document.getElementById(elementId);
-        el.value = ""; 
-        let i = 0;
-        const interval = setInterval(() => {
-            el.value += text.charAt(i);
-            i++;
-            if (i >= text.length) {
-                clearInterval(interval);
-                if (callback) callback(); 
-            }
-        }, speed);
-    }
-</script>
 {% endblock %}

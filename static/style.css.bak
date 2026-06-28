@@ -130,19 +130,17 @@ nav {
     /* Lighter blur to blend subtly without becoming milky */
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
-    /* Keeps the nav bar floating near the top of the screen */
+    /* Keeps the nav bar at the top of the screen */
     position: sticky;
-    top: 12px;
-    margin: 12px;
-    border-radius: 18px;
-
+    top: 0;
+    
     color: white;
     padding: 0.85rem 2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
     z-index: 100;
-    box-shadow: 0 8px 24px rgba(20, 23, 40, 0.22);
+    box-shadow: 0 2px 14px rgba(20, 23, 40, 0.18);
 }
 
 .logo {
@@ -259,8 +257,19 @@ nav {
     line-height: 1;
 }
 
-/* (Legacy bare ".side-menu a" styling removed — the refreshed drawer
-   styles its links via .drawer-links a and .drawer-account .btn below.) */
+.side-menu a {
+    padding: 15px 20px;
+    text-decoration: none;
+    font-size: 1.1rem;
+    color: var(--link-on-dark);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    transition: 0.2s;
+}
+
+.side-menu a:hover {
+    background-color: var(--secondary);
+    color: white;
+}
 
 /* Overlay for mobile menu */
 .menu-overlay {
@@ -952,9 +961,7 @@ footer {
     padding: 2rem 1rem;
     background-color: var(--dark);
     color: white;
-    margin: auto 12px 12px;   /* auto top keeps footer pinned to the bottom */
-    border-radius: 18px;
-    box-shadow: 0 8px 24px rgba(20, 23, 40, 0.18);
+    margin-top: auto;
 }
 
 .footer-links {
@@ -1252,390 +1259,3 @@ footer {
         flex-grow: 1;
     }
 }
-/* =====================================================================
-   v1.5 — Nav refresh, mobile drawer, dark mode, new feature components
-   ===================================================================== */
-
-/* --- Nav layout additions --- */
-.nav-right {
-    display: flex;
-    align-items: center;
-    gap: 18px;
-}
-.logo span { white-space: nowrap; }
-
-.nav-account {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-}
-
-.btn-nav-text {
-    color: #fff;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.96rem;
-    white-space: nowrap;
-}
-.btn-nav-text:hover, .btn-nav-text:focus-visible { text-decoration: underline; color: #fff; }
-
-.btn-sm { padding: 8px 16px; font-size: 0.9rem; }
-
-/* Account chip + avatar */
-.account-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 5px 12px 5px 6px;
-    border-radius: var(--radius-pill);
-    background: rgba(255, 255, 255, 0.12);
-    color: #fff;
-    text-decoration: none;
-    font-weight: 600;
-    transition: background var(--transition);
-}
-.account-chip:hover, .account-chip:focus-visible { background: rgba(255, 255, 255, 0.22); color: #fff; }
-
-.avatar {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: var(--primary);
-    color: #fff;
-    font-weight: 800;
-    font-size: 0.85rem;
-    flex-shrink: 0;
-}
-.avatar-lg { width: 46px; height: 46px; font-size: 1.2rem; }
-
-/* Theme toggle button */
-.theme-toggle {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: none;
-    background: rgba(255, 255, 255, 0.12);
-    color: #fff;
-    cursor: pointer;
-    font-size: 1.15rem;
-    transition: background var(--transition), transform var(--transition);
-}
-.theme-toggle:hover, .theme-toggle:focus-visible { background: rgba(255, 255, 255, 0.24); transform: rotate(12deg); }
-.theme-icon { display: none; line-height: 1; }
-[data-theme="light"] .theme-icon-moon { display: inline; }
-[data-theme="dark"]  .theme-icon-sun  { display: inline; }
-
-/* Animated hamburger (3 bars) */
-.menu-toggle {
-    display: none;
-    flex-direction: column;
-    justify-content: center;
-    gap: 5px;
-    width: 44px;
-    height: 44px;
-    padding: 9px;
-    background: none;
-    border: none;
-    cursor: pointer;
-}
-.menu-bar {
-    display: block;
-    width: 26px;
-    height: 2px;
-    background: #fff;
-    border-radius: 2px;
-    transition: transform 0.3s ease, opacity 0.3s ease;
-}
-.menu-toggle.open .menu-bar:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-.menu-toggle.open .menu-bar:nth-child(2) { opacity: 0; }
-.menu-toggle.open .menu-bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-
-/* --- Mobile drawer refresh --- */
-.side-menu {
-    width: min(86vw, 320px);
-    background: var(--surface);
-    box-shadow: -8px 0 30px rgba(0,0,0,0.28);
-    overflow-y: auto;
-    gap: 0;
-}
-.side-menu-header {
-    background: linear-gradient(135deg, var(--secondary), #33489f);
-    color: #fff;
-}
-.side-menu-title { font-family: var(--font-title); font-style: italic; font-size: 1.4rem; }
-
-.drawer-account {
-    padding: 1.1rem 1.1rem 1.25rem;
-    border-bottom: 1px solid var(--border);
-    display: grid;
-    gap: 10px;
-}
-.drawer-user { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
-.drawer-user strong { color: var(--text-color); display: block; }
-.drawer-role { color: var(--muted); font-size: 0.82rem; }
-.drawer-cta-text { color: var(--muted); font-size: 0.9rem; margin-bottom: 2px; }
-
-.drawer-links { display: flex; flex-direction: column; padding: 0.5rem 0; }
-.side-menu .drawer-links a {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 14px 1.1rem;
-    color: var(--text-color);
-    font-size: 1.02rem;
-    font-weight: 500;
-    border-bottom: 1px solid var(--border);
-    text-decoration: none;
-    transition: background var(--transition);
-}
-.side-menu .drawer-links a:hover { background: var(--bg-tint); color: var(--text-color); }
-.drawer-ico { font-size: 1.15rem; width: 24px; text-align: center; }
-
-.drawer-theme {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    width: 100%;
-    padding: 14px 1.1rem;
-    background: none;
-    border: none;
-    border-top: 1px solid var(--border);
-    color: var(--text-color);
-    font-size: 1rem;
-    font-weight: 500;
-    cursor: pointer;
-    text-align: left;
-}
-.drawer-theme:hover { background: var(--bg-tint); }
-
-/* --- Hero stat row --- */
-.hero-stats {
-    display: flex;
-    justify-content: center;
-    gap: 2.5rem;
-    margin-top: 2rem;
-    flex-wrap: wrap;
-}
-.hero-stat { text-align: center; }
-.hero-stat .num { font-size: 2rem; font-weight: 800; display: block; line-height: 1; }
-.hero-stat .lbl { font-size: 0.85rem; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.05em; }
-
-/* --- Browse filter bar --- */
-.filter-bar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    align-items: center;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 14px 16px;
-    margin-bottom: 1.5rem;
-    box-shadow: var(--shadow-sm);
-}
-.filter-bar .filter-group { display: flex; align-items: center; gap: 8px; }
-.filter-bar label { margin-bottom: 0; font-size: 0.88rem; color: var(--muted); white-space: nowrap; }
-.filter-bar select { width: auto; min-width: 150px; padding: 9px 12px; }
-.filter-bar .filter-spacer { flex: 1; }
-
-/* Category chip on cards / detail */
-.cat-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: var(--bg-tint);
-    color: var(--muted);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-pill);
-    padding: 3px 11px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    margin-bottom: 0.6rem;
-    align-self: flex-start;
-}
-
-/* --- Share button --- */
-.share-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 0.75rem; }
-
-/* --- Back to top FAB --- */
-.back-to-top {
-    position: fixed;
-    right: 22px;
-    bottom: 22px;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    border: none;
-    background: var(--secondary);
-    color: #fff;
-    font-size: 1.4rem;
-    cursor: pointer;
-    box-shadow: var(--shadow-lg);
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(12px);
-    transition: opacity var(--transition), transform var(--transition), background var(--transition), visibility var(--transition);
-    z-index: 800;
-}
-.back-to-top.show { opacity: 1; visibility: visible; transform: translateY(0); }
-.back-to-top:hover, .back-to-top:focus-visible { background: var(--primary); }
-
-/* --- Scroll-reveal animation --- */
-.reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.6s ease, transform 0.6s ease; }
-.reveal.is-visible { opacity: 1; transform: none; }
-@media (prefers-reduced-motion: reduce) {
-    .reveal { opacity: 1 !important; transform: none !important; transition: none; }
-}
-
-/* --- Auth + account pages --- */
-.auth-switch { text-align: center; margin-top: 1.25rem; color: var(--muted); font-size: 0.92rem; }
-.auth-switch a { font-weight: 600; }
-
-.account-header {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1.5rem;
-    box-shadow: var(--shadow-sm);
-    margin-bottom: 1.75rem;
-}
-.account-header .avatar-xl {
-    width: 64px; height: 64px; font-size: 1.7rem;
-    display: inline-flex; align-items: center; justify-content: center;
-    border-radius: 50%; background: var(--primary); color: #fff; font-weight: 800; flex-shrink: 0;
-}
-.account-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.prefill-note {
-    display: flex; gap: 10px; align-items: flex-start;
-    background: var(--bg-tint); border: 1px solid var(--border); border-left: 4px solid var(--primary);
-    border-radius: var(--radius-sm); padding: 12px 14px; font-size: 0.9rem; color: var(--muted);
-    margin-bottom: 1.25rem;
-}
-
-/* =====================================================================
-   DARK MODE
-   ===================================================================== */
-[data-theme="dark"] {
-    --surface: #1e2230;
-    --bg-tint: #262b3b;
-    --border: #343b50;
-    --text-color: #e7e9f1;
-    --muted: #aab1c4;
-    --link-on-dark: #ffd9c4;
-}
-
-[data-theme="dark"] body {
-    background-image:
-        linear-gradient(rgba(18, 21, 32, 0.92), rgba(14, 16, 24, 0.95)),
-        url('seven_lakes_logo.png');
-    color: var(--text-color);
-}
-
-/* Headings & links readable on dark */
-[data-theme="dark"] h1,
-[data-theme="dark"] h2,
-[data-theme="dark"] h3,
-[data-theme="dark"] h4,
-[data-theme="dark"] .item-title,
-[data-theme="dark"] .stat-number,
-[data-theme="dark"] .modal-label,
-[data-theme="dark"] label { color: #b9c6ff; }
-[data-theme="dark"] a { color: #aebfff; }
-[data-theme="dark"] .back-link { color: #aebfff; }
-
-/* Surfaces that were hard-coded light */
-[data-theme="dark"] .modal-content,
-[data-theme="dark"] input[type="text"],
-[data-theme="dark"] input[type="date"],
-[data-theme="dark"] input[type="email"],
-[data-theme="dark"] input[type="password"],
-[data-theme="dark"] textarea,
-[data-theme="dark"] select {
-    background: #161a26;
-    border-color: #3a4258;
-    color: var(--text-color);
-}
-[data-theme="dark"] input[type="text"],
-[data-theme="dark"] input[type="date"],
-[data-theme="dark"] input[type="email"],
-[data-theme="dark"] input[type="password"],
-[data-theme="dark"] textarea,
-[data-theme="dark"] select { border-color: #3a4258; }
-
-[data-theme="dark"] .item-image,
-[data-theme="dark"] .item-image-wrap,
-[data-theme="dark"] .detail-image { background-color: #2a3042; }
-[data-theme="dark"] .item-image.placeholder { color: #9aa2b8; }
-
-[data-theme="dark"] .admin-table th { background: #1b2550; }
-[data-theme="dark"] .admin-table td { border-bottom-color: var(--border); }
-[data-theme="dark"] .admin-table tr { background: var(--surface); border-color: var(--border); }
-
-[data-theme="dark"] .toggle-tabs .btn { color: #b9c6ff; }
-[data-theme="dark"] .toggle-tabs .btn:hover { background: rgba(174, 191, 255, 0.12); }
-[data-theme="dark"] .search-form { background: var(--surface) !important; }
-
-/* Flash messages tuned for dark */
-[data-theme="dark"] .flash.success { background: #15321f; color: #b7e7c6; border-color: #205838; }
-[data-theme="dark"] .flash.error { background: #3a1d1d; color: #f3c2c2; border-color: #6b2f2f; }
-
-/* Keep main section underline gradient visible */
-[data-theme="dark"] .section-intro,
-[data-theme="dark"] .field-hint,
-[data-theme="dark"] .meta { color: var(--muted); }
-                                                                                                                                   
-/* =====================================================================
-   v1.5 — Mobile refinements (override earlier rules; keep at file end)
-   ===================================================================== */
-@media screen and (max-width: 768px) {
-    nav { padding: 0.7rem 1rem; }
-    .logo { font-size: 1.3rem; gap: 9px; }
-    .logo-img { height: 28px; }
-    .nav-right { gap: 8px; }
-
-    /* Show the animated hamburger, hide desktop-only nav + account */
-    .menu-toggle { display: flex; }
-    .desktop-nav { display: none; }
-
-    .theme-toggle { width: 38px; height: 38px; }
-
-    /* Comfortable tap targets everywhere */
-    .btn { min-height: 44px; }
-
-    /* Hero + stats scale down */
-    .hero { border-radius: 0; margin: -2rem -0.5rem 1.75rem; }
-    .hero-actions .btn { width: 100%; }
-    .hero-stats { gap: 1.75rem; }
-
-    /* Filter bar stacks */
-    .filter-bar { flex-direction: column; align-items: stretch; }
-    .filter-bar .filter-group { justify-content: space-between; }
-    .filter-bar select { flex: 1; }
-    .filter-bar .filter-spacer { display: none; }
-
-    .account-grid { grid-template-columns: 1fr; }
-
-    .back-to-top { right: 14px; bottom: 14px; width: 44px; height: 44px; }
-}
-
-/* Tablet: keep the desktop nav but tighten spacing */
-@media screen and (min-width: 769px) and (max-width: 980px) {
-    nav { padding: 0.8rem 1.25rem; }
-    .nav-right { gap: 12px; }
-    .nav-links { gap: 12px; }
-}
-
-/* Dashboard section heading accents (dark-mode aware) */
-.h-amber { color: #8a6400; }
-.h-lost  { color: var(--accent); }
-[data-theme="dark"] .h-amber { color: #f0c462; }
-[data-theme="dark"] .h-lost  { color: #ff8a7a; }

@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block title %}My Account &middot; SLHS Lost &amp; Found{% endblock %}
+
+{% block content %}
+<div class="account-header">
+    <span class="avatar-xl" aria-hidden="true">{{ (user.full_name or 'S')[0]|upper }}</span>
+    <div>
+        <h1 style="margin-bottom:0.25rem;">{{ user.full_name or 'My Account' }}</h1>
+        <p class="section-intro" style="margin:0;">
+            {% if user.student_id %}ID {{ user.student_id }} &middot; {% endif %}{{ user.email }}
+        </p>
+    </div>
+</div>
+
+<div style="display:grid; grid-template-columns: 1fr; gap: 1.75rem;">
+
+    <section class="form-container" style="max-width:none; margin:0;">
+        <h2>Profile</h2>
+        <p class="section-intro">These details are used to pre-fill your reports and claims.</p>
+        <form method="post">
+            <div class="account-grid">
+                <div class="form-group">
+                    <label for="full_name">Full Name</label>
+                    <input type="text" id="full_name" name="full_name" value="{{ user.full_name or '' }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="student_id">Student ID</label>
+                    <input type="text" id="student_id" name="student_id" value="{{ user.student_id or '' }}">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Save changes</button>
+        </form>
+    </section>
+
+    <section>
+        <h2>My Reports</h2>
+        <p class="section-intro">Items you've reported as lost or found.</p>
+        {% if my_items %}
+        <div class="item-grid">
+            {% for item in my_items %}
+            <div class="item-card">
+                <div class="item-image-wrap">
+                    {% if item.report_type == 'lost' %}
+                        <span class="badge badge-lost card-badge">Lost</span>
+                    {% else %}
+                        <span class="badge badge-found card-badge">Found</span>
+                    {% endif %}
+                    {% if item.image_file %}
+                        <img src="{{ url_for('static', filename='uploads/' + item.image_file) }}" alt="Photo of {{ item.title }}" class="item-image" loading="lazy">
+                    {% else %}
+                        <div class="item-image placeholder">No Photo</div>
+                    {% endif %}
+                </div>
+                <div class="item-details">
+                    <span class="cat-chip">{{ item.category|category_icon }} {{ item.category }}</span>
+                    <h3 class="item-title">{{ item.title }}</h3>
+                    <p class="meta"><span class="meta-icon" aria-hidden="true">&#128197;</span>{{ item.date_found|days_ago }}</p>
+                    <p class="meta">
+                        Status:
+                        {% if item.status == 'approved' %}
+                            <span class="status-pill live">Live</span>
+                        {% else %}
+                            <span class="status-pill searching">Pending</span>
+                        {% endif %}
+                    </p>
+                    {% if item.status == 'approved' %}
+                        <a href="{{ url_for('item_detail', id=item.id) }}" class="btn btn-block">View</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <span class="empty-emoji" aria-hidden="true">&#128221;</span>
+            <strong>No reports yet</strong>
+            When you report a lost or found item, it will show up here.
+            <div style="margin-top:1rem;"><a href="{{ url_for('report', type='found') }}" class="btn btn-primary">Report an Item</a></div>
+        </div>
+        {% endif %}
+    </section>
+
+    <section>
+        <h2>My Claims</h2>
+        <p class="section-intro">Inquiries and claims you've submitted.</p>
+        {% if my_claims %}
+        <div style="display:grid; gap:12px;">
+            {% for claim in my_claims %}
+            <div class="form-container" style="max-width:none; margin:0; padding:1.1rem 1.25rem;">
+                <strong>{{ claim.item_title }}</strong>
+                <p class="meta" style="margin-top:6px;">{{ claim.proof_description }}</p>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <span class="empty-emoji" aria-hidden="true">&#128233;</span>
+            <strong>No claims yet</strong>
+            Found an item that's yours? Browse the listings and submit a claim.
+            <div style="margin-top:1rem;"><a href="{{ url_for('items') }}" class="btn btn-primary">Browse Items</a></div>
+        </div>
+        {% endif %}
+    </section>
+
+    <div>
+        <a href="{{ url_for('logout') }}" class="btn btn-outline">Log out</a>
+    </div>
+</div>
+{% endblock %}

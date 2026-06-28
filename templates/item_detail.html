@@ -1,68 +1,83 @@
 {% extends 'base.html' %}
 
+{% block title %}{{ item.title }} &middot; SLHS Lost &amp; Found{% endblock %}
+
 {% block content %}
 <!-- Use JavaScript to go back to the correct tab -->
-<a href="javascript:history.back()" style="display: inline-block; margin-bottom: 1rem;">&larr; Back to Listings</a>
+<a href="javascript:history.back()" class="back-link">&larr; Back to Listings</a>
 
 <div class="detail-container">
     <div style="flex: 1; min-width: 300px; ">
         {% if item.image_file %}
             <img src="{{ url_for('static', filename='uploads/' + item.image_file) }}" alt="Photo of {{ item.title }}" class="detail-image">
         {% else %}
-            <div style="width: 100%; height: 300px; background: #eee; display: flex; align-items: center; justify-content: center;">No Image Available</div>
+            <div class="detail-image" style="width: 100%; height: 300px; display: flex; align-items: center; justify-content: center; color:#8a8f98;">No Image Available</div>
         {% endif %}
     </div>
-    
+
     <div style="flex: 1; min-width: 300px;">
-        <h1 style="color: var(--primary);">
+        <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
             {% if item.report_type == 'lost' %}
-                <span style="background-color: var(--accent); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.9rem; vertical-align: middle; margin-right: 5px;">LOST</span>
+                <span class="badge badge-lost">Lost</span>
             {% else %}
-                <span style="background-color: var(--secondary); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.9rem; vertical-align: middle; margin-right: 5px;">FOUND</span>
+                <span class="badge badge-found">Found</span>
             {% endif %}
-            {{ item.title }}
-        </h1>
-        <p style="margin-top: 0.5rem; font-style: italic; color: #666;">Reported on {{ item.date_found }}</p>
-        
-        <div style="margin: 2rem 0;">
+            {% if item.category %}<span class="cat-chip" style="margin-bottom:0;">{{ item.category|category_icon }} {{ item.category }}</span>{% endif %}
+        </div>
+        <h1 style="margin-top: 0.6rem;">{{ item.title }}</h1>
+        <p class="detail-meta-row"><span aria-hidden="true">&#128197;</span> Reported {{ item.date_found|days_ago }} &middot; {{ item.date_found }}</p>
+
+        <div class="share-row">
+            <button type="button" class="btn btn-outline btn-sm js-share"
+                    data-url="{{ request.url }}"
+                    data-title="{{ item.title }} - SLHS Lost &amp; Found"
+                    data-label="&#128279; Share">&#128279; Share</button>
+        </div>
+
+        <div style="margin: 1.75rem 0;">
             <h3>Description</h3>
             <p>{{ item.description }}</p>
         </div>
 
-        <div style="margin: 2rem 0;">
+        <div style="margin: 1.75rem 0;">
             <h3>Location</h3>
-            <p>{{ item.location }}</p>
+            <p class="detail-meta-row"><span aria-hidden="true">&#128205;</span> {{ item.location }}</p>
         </div>
 
         <!-- Claim Request Form -->
-        <div style="background: #f1f8ff; padding: 1.5rem; border-radius: 8px; border: 2px solid black;">
+        <div class="claim-card">
             {% if item.report_type == 'found' %}
                 <h3>Is this yours?</h3>
-                <p style="margin-bottom: 1rem; font-size: 0.9rem;">Submit a claim request below. The Admin will review your proof and contact you directly.</p>
+                <p style="margin-bottom: 1.1rem; font-size: 0.92rem; color: var(--muted);">Submit a claim request below. The admin will review your proof and contact you directly.</p>
             {% else %}
                 <h3>Did you find this?</h3>
-                <p style="margin-bottom: 1rem; font-size: 0.9rem;">Submit a note below letting the admin know where you turned it in, or where you have it.</p>
+                <p style="margin-bottom: 1.1rem; font-size: 0.92rem; color: var(--muted);">Submit a note below letting the admin know where you turned it in, or where you have it.</p>
             {% endif %}
-            
+
+            {% if current_user and current_user.role == 'student' %}
+            <p class="field-hint" style="margin-bottom:1rem;">&#9989; Filled in from your account &mdash; edit if needed.</p>
+            {% endif %}
             <form method="post">
                 <div class="form-group">
                     <label for="claimer_name">Your Name</label>
-                    <input type="text" name="claimer_name" required style="width:100%; padding:8px; margin-bottom:10px;">
+                    <input type="text" id="claimer_name" name="claimer_name" autocomplete="name" required
+                           value="{% if current_user and current_user.role == 'student' %}{{ current_user.full_name }}{% endif %}">
                 </div>
-                
+
                 <div class="form-group">
                     <label for="claimer_contact">Your Contact (Email/Phone)</label>
-                    <input type="text" name="claimer_contact" required style="width:100%; padding:8px; margin-bottom:10px;">
+                    <input type="text" id="claimer_contact" name="claimer_contact" required
+                           value="{% if current_user and current_user.role == 'student' %}{{ current_user.email }}{% endif %}">
                 </div>
 
                 <div class="form-group">
                     <label for="proof_description">
                         {% if item.report_type == 'found' %}Proof of Ownership{% else %}Where is it now?{% endif %}
                     </label>
-                    <textarea name="proof_description" rows="3" required placeholder="{% if item.report_type == 'found' %}Describe something not visible in the photo...{% else %}I turned it into the main office...{% endif %}" style="width:100%; padding:8px; margin-bottom:10px;"></textarea>
+                    <textarea id="proof_description" name="proof_description" rows="3" required placeholder="{% if item.report_type == 'found' %}Describe something not visible in the photo...{% else %}I turned it in to the main office...{% endif %}"></textarea>
                 </div>
 
-                <button type="submit" class="btn">Send Request</button>
+                <button type="submit" class="btn btn-primary btn-block">Send Request</button>
             </form>
         </div>
     </div>
