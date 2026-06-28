@@ -9,7 +9,7 @@
 <div class="detail-container">
     <div style="flex: 1; min-width: 300px; ">
         {% if item.image_file %}
-            <img src="{{ url_for('static', filename='uploads/' + item.image_file) }}" alt="Photo of {{ item.title }}" class="detail-image">
+            <img src="{{ image_url(item.image_file) }}" alt="Photo of {{ item.title }}" class="detail-image">
         {% else %}
             <div class="detail-image" style="width: 100%; height: 300px; display: flex; align-items: center; justify-content: center; color:#8a8f98;">No Image Available</div>
         {% endif %}

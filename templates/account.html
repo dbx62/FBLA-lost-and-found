@@ -47,7 +47,7 @@
                         <span class="badge badge-found card-badge">Found</span>
                     {% endif %}
                     {% if item.image_file %}
-                        <img src="{{ url_for('static', filename='uploads/' + item.image_file) }}" alt="Photo of {{ item.title }}" class="item-image" loading="lazy">
+                        <img src="{{ image_url(item.image_file) }}" alt="Photo of {{ item.title }}" class="item-image" loading="lazy">
                     {% else %}
                         <div class="item-image placeholder">No Photo</div>
                     {% endif %}

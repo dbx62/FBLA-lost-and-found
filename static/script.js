@@ -301,7 +301,7 @@ function setupDashboardModal() {
 
         var imgFile = btn.getAttribute('data-img');
         if (imgFile && imgFile !== 'None' && imgFile !== '') {
-            modalImg.src = '/static/uploads/' + imgFile;
+            modalImg.src = imgFile;
             modalImg.style.display = 'block';
         } else {
             modalImg.removeAttribute('src');

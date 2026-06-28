@@ -63,7 +63,7 @@
                             data-location="{{ item.location }}"
                             data-date="{{ item.date_found }}"
                             data-contact="{{ item.contact_info }}"
-                            data-img="{{ item.image_file or '' }}">
+                            data-img="{{ image_url(item.image_file) }}">
                         Preview
                     </button>
                     <a href="{{ url_for('approve', id=item.id) }}" class="btn btn-primary">Approve</a>
@@ -151,7 +151,7 @@
                             data-location="{{ item.location }}"
                             data-date="{{ item.date_found }}"
                             data-contact="{{ item.contact_info }}"
-                            data-img="{{ item.image_file or '' }}">
+                            data-img="{{ image_url(item.image_file) }}">
                         Preview
                     </button>
                     <a href="{{ url_for('delete', id=item.id) }}" class="btn btn-danger js-confirm" data-confirm="Delete this item (and all its claims)?">Remove</a>
@@ -195,7 +195,7 @@
                             data-location="{{ item.location }}"
                             data-date="{{ item.date_found }}"
                             data-contact="{{ item.contact_info }}"
-                            data-img="{{ item.image_file or '' }}">
+                            data-img="{{ image_url(item.image_file) }}">
                         Preview
                     </button>
                     <a href="{{ url_for('delete', id=item.id) }}" class="btn btn-danger js-confirm" data-confirm="Delete this lost report?">Remove</a>

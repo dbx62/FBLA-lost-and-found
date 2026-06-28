@@ -1,6 +1,9 @@
 import os
 import sqlite3
 import uuid
+import json
+import urllib.request
+import urllib.error
 from datetime import datetime, date
 from flask import Flask, render_template, request, redirect, url_for, flash, session, g
 from werkzeug.utils import secure_filename
@@ -31,6 +34,34 @@ USE_POSTGRES = bool(DATABASE_URL)
 if USE_POSTGRES:
     import psycopg
     from psycopg.rows import dict_row
+
+
+def _project_ref_from_db_url():
+    """Pull the Supabase project ref out of the pooler username (postgres.<ref>)."""
+    if not DATABASE_URL:
+        return None
+    try:
+        creds = DATABASE_URL.split('://', 1)[1].rsplit('@', 1)[0]
+        user = creds.split(':', 1)[0]
+        if user.startswith('postgres.'):
+            return user.split('.', 1)[1]
+    except Exception:
+        return None
+    return None
+
+
+# --- Supabase Storage (image uploads) ---
+# If a service key is provided, uploaded photos go to a Supabase Storage bucket
+# and we store the public URL. Otherwise we fall back to the local uploads
+# folder, so the app keeps working with no extra setup.
+SUPABASE_URL = os.environ.get('SUPABASE_URL')
+if not SUPABASE_URL:
+    _ref = _project_ref_from_db_url()
+    if _ref:
+        SUPABASE_URL = 'https://%s.supabase.co' % _ref
+SUPABASE_SERVICE_KEY = os.environ.get('SUPABASE_SERVICE_KEY')
+SUPABASE_BUCKET = os.environ.get('SUPABASE_BUCKET', 'item-images')
+STORAGE_ENABLED = bool(SUPABASE_URL and SUPABASE_SERVICE_KEY)
 
 # Allowed extensions for image uploads
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'avif'}
@@ -217,6 +248,64 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+
+_bucket_checked = False
+
+
+def _ensure_bucket():
+    """Best-effort: create the public Storage bucket once if it doesn't exist."""
+    global _bucket_checked
+    if _bucket_checked:
+        return
+    _bucket_checked = True
+    try:
+        body = json.dumps({'id': SUPABASE_BUCKET, 'name': SUPABASE_BUCKET, 'public': True}).encode()
+        req = urllib.request.Request('%s/storage/v1/bucket' % SUPABASE_URL, data=body, method='POST')
+        req.add_header('Authorization', 'Bearer %s' % SUPABASE_SERVICE_KEY)
+        req.add_header('apikey', SUPABASE_SERVICE_KEY)
+        req.add_header('Content-Type', 'application/json')
+        urllib.request.urlopen(req, timeout=15).read()
+    except Exception:
+        pass  # already exists or insufficient perms; the upload surfaces real errors
+
+
+def _upload_to_supabase(object_name, data, content_type):
+    url = '%s/storage/v1/object/%s/%s' % (SUPABASE_URL, SUPABASE_BUCKET, object_name)
+    req = urllib.request.Request(url, data=data, method='POST')
+    req.add_header('Authorization', 'Bearer %s' % SUPABASE_SERVICE_KEY)
+    req.add_header('apikey', SUPABASE_SERVICE_KEY)
+    req.add_header('Content-Type', content_type or 'application/octet-stream')
+    req.add_header('x-upsert', 'true')
+    urllib.request.urlopen(req, timeout=20).read()
+    return '%s/storage/v1/object/public/%s/%s' % (SUPABASE_URL, SUPABASE_BUCKET, object_name)
+
+
+def save_upload(file):
+    """Store an uploaded image. Uses Supabase Storage when configured (returns a
+    public URL); otherwise saves to the local uploads folder (returns a filename)."""
+    object_name = '%s_%s' % (uuid.uuid4().hex, secure_filename(file.filename))
+    data = file.read()
+    if STORAGE_ENABLED:
+        try:
+            _ensure_bucket()
+            return _upload_to_supabase(object_name, data, file.mimetype)
+        except Exception as exc:
+            app.logger.warning('Supabase Storage upload failed (%s); saving locally instead.', exc)
+    with open(os.path.join(app.config['UPLOAD_FOLDER'], object_name), 'wb') as fh:
+        fh.write(data)
+    return object_name
+
+
+def image_url(value):
+    """Resolve an item's stored image reference to a usable URL. Full URLs
+    (Supabase Storage) are returned as-is; bare filenames map to the local
+    uploads folder (legacy/local items)."""
+    if not value:
+        return ''
+    if value.startswith('http://') or value.startswith('https://'):
+        return value
+    return url_for('static', filename='uploads/' + value)
+
 def current_user():
     """Returns the logged-in user row, or None for guests."""
     uid = session.get('user_id')
@@ -231,7 +320,7 @@ def is_admin():
 @app.context_processor
 def inject_globals():
     """Makes the user and category list available to every template."""
-    return dict(current_user=current_user(), CATEGORIES=CATEGORIES)
+    return dict(current_user=current_user(), CATEGORIES=CATEGORIES, image_url=image_url)
 
 @app.template_filter('days_ago')
 def days_ago(value):
@@ -288,15 +377,12 @@ def report():
         if category not in CATEGORIES:
             category = 'Other'
 
-        # Handle image upload
+        # Handle image upload (Supabase Storage if configured, else local folder)
         filename = None
         if 'image' in request.files:
             file = request.files['image']
-            if file and allowed_file(file.filename):
-                filename = secure_filename(file.filename)
-                # Ensure unique filename
-                filename = "%s_%s" % (uuid.uuid4().hex, filename)
-                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            if file and file.filename and allowed_file(file.filename):
+                filename = save_upload(file)
 
         db = get_db()
         db.execute(

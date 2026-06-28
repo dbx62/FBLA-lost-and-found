@@ -1634,8 +1634,74 @@ footer {
     .nav-links { gap: 12px; }
 }
 
-/* Dashboard section heading accents (dark-mode aware) */
-.h-amber { color: #8a6400; }
-.h-lost  { color: var(--accent); }
-[data-theme="dark"] .h-amber { color: #f0c462; }
-[data-theme="dark"] .h-lost  { color: #ff8a7a; }
+/* Dashboard section heading accen
+/* =====================================================================
+   v1.6 — Responsive hardening (works cleanly on any screen size)
+   ===================================================================== */
+
+/* Never let media or grids push the page wider than the screen */
+img, svg, video, canvas { max-width: 100%; }
+html, body { max-width: 100%; }
+
+/* Let the logo shrink (with ellipsis) before the nav controls do */
+.logo { min-width: 0; flex-shrink: 1; }
+.logo span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nav-right { flex-shrink: 0; }
+
+/* Wrap instead of overflow on narrow screens */
+.toggle-tabs { flex-wrap: wrap; max-width: 100%; }
+.account-header { flex-wrap: wrap; }
+.share-row { flex-wrap: wrap; }
+.hero-actions { max-width: 100%; }
+
+/* Tablet / small-laptop: ease the grids in a bit sooner */
+@media screen and (max-width: 1024px) {
+    .item-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+}
+
+/* Phones & small tablets */
+@media screen and (max-width: 768px) {
+    /* Keep the hero inside the floating layout (no full-bleed clipping) */
+    .hero { margin: 0 0 1.5rem; border-radius: var(--radius); }
+
+    /* Stacked detail page: clear the 300px min-widths so nothing overflows */
+    .detail-container > div { min-width: 0 !important; }
+
+    /* Two-up stat grids collapse cleanly */
+    .dash-stats { grid-template-columns: 1fr 1fr; }
+    .hero-stats { gap: 1.5rem; }
+}
+
+/* Small phones */
+@media screen and (max-width: 480px) {
+    nav { margin: 8px; top: 8px; padding: 0.6rem 0.85rem; }
+    .logo { font-size: 1.12rem; gap: 7px; }
+    .logo-img { height: 24px; }
+    .nav-right { gap: 6px; }
+    .theme-toggle { width: 36px; height: 36px; font-size: 1rem; }
+
+    main { padding: 0 0.75rem; margin: 1.25rem auto; }
+
+    .hero { padding: 2rem 1.1rem; }
+    .hero h1 { font-size: 1.7rem; }
+    .hero p { font-size: 1rem; }
+    .hero-stats { gap: 1.1rem; }
+    .hero-stat .num { font-size: 1.6rem; }
+
+    h1 { font-size: 1.55rem; }
+    h2 { font-size: 1.3rem; }
+
+    .form-container { padding: 1.25rem 1rem; }
+    .item-grid { gap: 16px; }
+    .dash-stats { grid-template-columns: 1fr; }
+
+    footer { margin: auto 8px 8px; padding: 1.5rem 1rem; }
+    .footer-links a { display: inline-block; margin: 4px 8px; }
+
+    .back-to-top { right: 12px; bottom: 12px; width: 42px; height: 42px; }
+}
+
+/* Very large screens: keep line lengths comfortable */
+@media screen and (min-width: 1500px) {
+    main { max-width: 1320px; }
+}

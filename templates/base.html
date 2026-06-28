@@ -11,8 +11,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@1,400&display=swap" rel="stylesheet">
 
-    <!-- Cache buster (?v=1.5) to force the newest stylesheet to load -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=1.5">
+    <!-- Cache buster (?v=1.6) to force the newest stylesheet to load -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=1.6">
     <meta name="description" content="Seven Lakes High School Lost and Found System">
 
     <!-- Theme bootstrap: applies the saved light/dark choice before paint
@@ -165,7 +165,7 @@
     <button class="back-to-top" id="backToTop" type="button" aria-label="Back to top">&#8593;</button>
 
     <!-- Site-wide scripts (kept in a separate file to fully separate languages) -->
-    <script src="{{ url_for('static', filename='script.js') }}?v=1.5" defer></script>
+    <script src="{{ url_for('static', filename='script.js') }}?v=1.6" defer></script>
     {% block scripts %}{% endblock %}
 </body>
 </html>
