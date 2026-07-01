@@ -11,12 +11,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@1,400&display=swap" rel="stylesheet">
 
-    <!-- Cache buster (?v=1.6) to force the newest stylesheet to load -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=1.6">
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=1.9">
     <meta name="description" content="Seven Lakes High School Lost and Found System">
 
-    <!-- Theme bootstrap: applies the saved light/dark choice before paint
-         so there is no flash of the wrong theme. -->
+    <!-- Theme bootstrap -->
     <script>
         (function () {
             try {
@@ -28,7 +27,7 @@
     </script>
 </head>
 <body>
-    <!-- Skip link: lets keyboard and screen-reader users jump past the nav -->
+    <!-- Skip link -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
     <header>
@@ -55,8 +54,8 @@
                     <span class="theme-icon theme-icon-moon" aria-hidden="true">&#9789;</span>
                 </button>
 
-                <!-- Account area (desktop) -->
-                <div class="nav-account desktop-nav">
+                <!-- Account area -->
+                <div class="nav-account">
                     {% if current_user and current_user.role == 'admin' %}
                         <a href="{{ url_for('logout') }}" class="btn-nav-text">Log out</a>
                     {% elif current_user %}
@@ -88,41 +87,15 @@
             <button class="close-btn" id="menuClose" type="button" aria-label="Close navigation menu">&times;</button>
         </div>
 
-        <!-- Account block -->
-        <div class="drawer-account">
-            {% if current_user and current_user.role == 'admin' %}
-                <div class="drawer-user">
-                    <span class="avatar avatar-lg" aria-hidden="true">A</span>
-                    <div>
-                        <strong>Administrator</strong>
-                        <span class="drawer-role">Admin account</span>
-                    </div>
-                </div>
-                <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-block">Admin Dashboard</a>
-                <a href="{{ url_for('logout') }}" class="btn btn-outline btn-block">Log out</a>
-            {% elif current_user %}
-                <div class="drawer-user">
-                    <span class="avatar avatar-lg" aria-hidden="true">{{ (current_user.full_name or 'S')[0]|upper }}</span>
-                    <div>
-                        <strong>{{ current_user.full_name or 'My Account' }}</strong>
-                        <span class="drawer-role">Student account</span>
-                    </div>
-                </div>
-                <a href="{{ url_for('account') }}" class="btn btn-primary btn-block">My Account</a>
-                <a href="{{ url_for('logout') }}" class="btn btn-outline btn-block">Log out</a>
-            {% else %}
-                <p class="drawer-cta-text">Sign in to skip filling in your details every time.</p>
-                <a href="{{ url_for('register') }}" class="btn btn-primary btn-block">Create account</a>
-                <a href="{{ url_for('login') }}" class="btn btn-outline btn-block">Log in</a>
-            {% endif %}
-        </div>
-
         <nav class="drawer-links" aria-label="Mobile navigation">
-            <a href="{{ url_for('index') }}"><span class="drawer-ico" aria-hidden="true">&#127968;</span> Home</a>
-            <a href="{{ url_for('report', type='found') }}"><span class="drawer-ico" aria-hidden="true">&#9989;</span> Report Found Item</a>
+            <a href="{{ url_for('index') }}" {% if request.endpoint == 'index' %}aria-current="page"{% endif %}><span class="drawer-ico" aria-hidden="true">&#127968;</span> Home</a>
+            <a href="{{ url_for('report', type='found') }}" {% if request.endpoint == 'report' %}aria-current="page"{% endif %}><span class="drawer-ico" aria-hidden="true">&#9989;</span> Report Found Item</a>
             <a href="{{ url_for('report', type='lost') }}"><span class="drawer-ico" aria-hidden="true">&#128269;</span> Report Lost Item</a>
-            <a href="{{ url_for('items') }}"><span class="drawer-ico" aria-hidden="true">&#128230;</span> Browse Items</a>
-            <a href="{{ url_for('contact') }}"><span class="drawer-ico" aria-hidden="true">&#9990;</span> Contact</a>
+            <a href="{{ url_for('items') }}" {% if request.endpoint == 'items' %}aria-current="page"{% endif %}><span class="drawer-ico" aria-hidden="true">&#128230;</span> Browse Items</a>
+            <a href="{{ url_for('contact') }}" {% if request.endpoint == 'contact' %}aria-current="page"{% endif %}><span class="drawer-ico" aria-hidden="true">&#9990;</span> Contact</a>
+            {% if current_user and current_user.role == 'admin' %}
+            <a href="{{ url_for('dashboard') }}" {% if request.endpoint == 'dashboard' %}aria-current="page"{% endif %}><span class="drawer-ico" aria-hidden="true">&#128202;</span> Dashboard</a>
+            {% endif %}
         </nav>
 
         <button class="drawer-theme" id="drawerThemeToggle" type="button">
@@ -164,8 +137,8 @@
     <!-- Back to top -->
     <button class="back-to-top" id="backToTop" type="button" aria-label="Back to top">&#8593;</button>
 
-    <!-- Site-wide scripts (kept in a separate file to fully separate languages) -->
-    <script src="{{ url_for('static', filename='script.js') }}?v=1.6" defer></script>
+    <!-- Site-wide scripts -->
+    <script src="{{ url_for('static', filename='script.js') }}?v=1.9" defer></script>
     {% block scripts %}{% endblock %}
 </body>
 </html>

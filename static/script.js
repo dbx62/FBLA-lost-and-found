@@ -1,14 +1,12 @@
 /* ============================================================
    SLHS Lost & Found - Site-wide JavaScript
-   All interactivity lives here so HTML, CSS, and JS stay in
-   separate files. Each feature checks that its elements exist
-   before running, so this one file can load safely on every page.
    ============================================================ */
 
 document.addEventListener('DOMContentLoaded', function () {
     setupTheme();
     setupMobileMenu();
     setupReportForm();
+    setupDemoAutofill();
     setupSearchToggle();
     setupFilters();
     setupDashboardModal();
@@ -20,8 +18,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 /* ------------------------------------------------------------
    Theme (light / dark) toggle
-   The <head> already applied the saved theme before paint; here
-   we wire the toggle buttons and persist the user's choice.
    ------------------------------------------------------------ */
 function setupTheme() {
     var root = document.documentElement;
@@ -108,7 +104,6 @@ function setupMobileMenu() {
     if (closeBtn) { closeBtn.addEventListener('click', closeMenu); }
     overlay.addEventListener('click', closeMenu);
 
-    // Close the drawer after tapping any link inside it.
     menu.querySelectorAll('a').forEach(function (link) {
         link.addEventListener('click', closeMenu);
     });
@@ -151,10 +146,8 @@ function setupReportForm() {
     updateForm();
 
     setupImagePreview();
-    setupDemoAutofill();
 }
 
-/* Shows a thumbnail of the chosen photo before the form is submitted. */
 function setupImagePreview() {
     var input = document.getElementById('image');
     var preview = document.getElementById('imagePreview');
@@ -173,63 +166,119 @@ function setupImagePreview() {
     });
 }
 
-/* Presentation helper: press Alt+D (or PageDown) to auto-type a
-   sample "found" report. Used to demo the form quickly to judges. */
+/* ------------------------------------------------------------
+   Live demo autofill (sign-up / login / report / claim forms)
+   Shortcuts: Alt+D fill (login=student), Alt+A admin,
+   Alt+F / Alt+L found / lost report, Alt+R reset.
+   ------------------------------------------------------------ */
 function setupDemoAutofill() {
-    var demoStep = 0;
-    var isTyping = false;
+    var $ = function (id) { return document.getElementById(id); };
 
-    function typeText(elementId, text, speed, callback) {
-        var el = document.getElementById(elementId);
-        if (!el) {
-            if (callback) { callback(); }
-            return;
-        }
+    var page = $('report_type') ? 'report'
+             : ($('full_name') && $('email') && $('password')) ? 'register'
+             : $('username') ? 'login'
+             : $('claimer_name') ? 'claim' : null;
+    if (!page) { return; }
+
+    var anchor = $('report_type') || $('full_name') || $('username') || $('claimer_name');
+    var form = anchor.closest('form');
+    if (!form) { return; }
+
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var gen = 0;
+
+    var DEMO = {
+        loginStudent: { username: 'maria.lopez@students.slhs.edu', password: 'demo1234' },
+        loginAdmin:   { username: 'admin', password: 'admin123' },
+        register: { full_name: 'Alex Rivera', student_id: 'K1190044', email: 'alex.rivera@students.slhs.edu', password: 'demo1234' },
+        found: { title: 'Texas Instruments TI-84 Plus CE', category: 'Electronics',
+                 description: 'Black graphing calculator with a blue slide case. Small FBLA sticker on the back and the battery door is missing.',
+                 location: 'Library - 2nd Floor Study Tables', contact: 'Maria Lopez - K1180023' },
+        lost:  { title: 'Silver MacBook Air 13-inch', category: 'Electronics',
+                 description: 'Silver 13-inch MacBook Air with a Seven Lakes sticker and a small dent on one corner. Last had it Tuesday afternoon.',
+                 location: 'Room 207 or the Library', contact: 'Maria Lopez - K1180023' },
+        claim: { claimer_name: 'Maria Lopez', claimer_contact: 'maria.lopez@students.slhs.edu',
+                 proof_description: 'It has a small dent near the base and a faded robotics-club sticker, and my initials "ML" are written on the cap.' }
+    };
+
+    function fire(el, type) { el.dispatchEvent(new Event(type, { bubbles: true })); }
+
+    function typeInto(el, text, speed, done) {
+        var mine = gen;
+        el.focus();
         el.value = '';
+        if (reduce) { el.value = text; fire(el, 'input'); if (done) { done(); } return; }
         var i = 0;
-        var interval = setInterval(function () {
-            el.value += text.charAt(i);
-            i++;
-            if (i >= text.length) {
-                clearInterval(interval);
-                if (callback) { callback(); }
-            }
+        var iv = setInterval(function () {
+            if (mine !== gen) { clearInterval(iv); return; }
+            el.value += text.charAt(i++);
+            if (i >= text.length) { clearInterval(iv); fire(el, 'input'); if (done) { done(); } }
         }, speed);
     }
 
-    document.addEventListener('keydown', function (e) {
-        if (!((e.key === 'PageDown' || (e.altKey && e.key === 'd')) && !isTyping)) {
-            return;
+    function run(seq) {
+        gen++;
+        var mine = gen, i = 0;
+        (function next() {
+            if (mine !== gen || i >= seq.length) { return; }
+            var s = seq[i++], el = $(s.id);
+            if (!el) { next(); return; }
+            if (el.tagName === 'SELECT' || el.type === 'date') { el.value = s.value; fire(el, 'change'); next(); }
+            else { typeInto(el, s.value, s.speed || 18, next); }
+        })();
+    }
+
+    function clearForm() {
+        gen++;
+        form.querySelectorAll('input, textarea').forEach(function (el) {
+            if (el.type === 'submit' || el.type === 'button' || el.type === 'hidden') { return; }
+            el.value = '';
+        });
+        var prev = $('imagePreview');
+        if (prev) { prev.removeAttribute('src'); prev.classList.remove('show'); }
+    }
+
+    function today() { return new Date().toISOString().split('T')[0]; }
+
+    function fill(opt) {
+        opt = opt || {};
+        clearForm();
+        var seq = [];
+        if (page === 'report') {
+            var t = opt.type || ($('report_type').value || 'found');
+            var rt = $('report_type'); rt.value = t; fire(rt, 'change');
+            var d = (t === 'lost') ? DEMO.lost : DEMO.found;
+            seq = [ { id: 'title', value: d.title }, { id: 'category', value: d.category },
+                    { id: 'description', value: d.description, speed: 10 }, { id: 'location', value: d.location },
+                    { id: 'date_found', value: today() }, { id: 'contact_info', value: d.contact } ];
+        } else if (page === 'register') {
+            var r = DEMO.register;
+            seq = [ { id: 'full_name', value: r.full_name }, { id: 'student_id', value: r.student_id },
+                    { id: 'email', value: r.email }, { id: 'password', value: r.password } ];
+        } else if (page === 'login') {
+            var l = (opt.role === 'admin') ? DEMO.loginAdmin : DEMO.loginStudent;
+            seq = [ { id: 'username', value: l.username }, { id: 'password', value: l.password } ];
+        } else if (page === 'claim') {
+            var c = DEMO.claim;
+            seq = [ { id: 'claimer_name', value: c.claimer_name }, { id: 'claimer_contact', value: c.claimer_contact },
+                    { id: 'proof_description', value: c.proof_description, speed: 10 } ];
         }
-        e.preventDefault();
+        run(seq);
+    }
 
-        var demoTitle = 'Texas Instruments TI-84 Plus CE';
-        var demoDesc = 'Black graphing calculator with a blue case. Has a small FBLA sticker on the back cover and is missing the battery door.';
-        var demoLoc = 'Library - 2nd Floor Study Tables';
-        var demoContact = 'Aditya Aggarwal - 1424500';
-
-        if (demoStep === 0) {
-            isTyping = true;
-            var typeSelect = document.getElementById('report_type');
-            if (typeSelect) {
-                typeSelect.value = 'found';
-                typeSelect.dispatchEvent(new Event('change'));
-            }
-            typeText('title', demoTitle, 30, function () { isTyping = false; demoStep++; });
-        } else if (demoStep === 1) {
-            isTyping = true;
-            typeText('description', demoDesc, 15, function () { isTyping = false; demoStep++; });
-        } else if (demoStep === 2) {
-            isTyping = true;
-            typeText('location', demoLoc, 30, function () { isTyping = false; demoStep++; });
-        } else if (demoStep === 3) {
-            var today = new Date().toISOString().split('T')[0];
-            var dateField = document.getElementById('date_found');
-            if (dateField) { dateField.value = today; }
-            demoStep++;
-        } else if (demoStep === 4) {
-            isTyping = true;
-            typeText('contact_info', demoContact, 30, function () { isTyping = false; demoStep++; });
+    document.addEventListener('keydown', function (e) {
+        if (!e.altKey && e.key !== 'PageDown') { return; }
+        var k = (e.key || '').toLowerCase();
+        if (e.altKey && k === 'r') { e.preventDefault(); clearForm(); return; }
+        if (e.key === 'PageDown' || (e.altKey && k === 'd')) {
+            e.preventDefault();
+            fill(page === 'login' ? { role: 'student' } : {});
+        } else if (e.altKey && k === 'a' && page === 'login') {
+            e.preventDefault(); fill({ role: 'admin' });
+        } else if (e.altKey && k === 'l' && page === 'report') {
+            e.preventDefault(); fill({ type: 'lost' });
+        } else if (e.altKey && k === 'f' && page === 'report') {
+            e.preventDefault(); fill({ type: 'found' });
         }
     });
 }

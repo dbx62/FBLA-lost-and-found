@@ -41,13 +41,13 @@
     padding: 0; 
 }
 
-/* Accessibility: Focus outlines for keyboard navigation */
+/* Focus outlines */
 *:focus-visible {
     outline: 3px solid var(--primary);
     outline-offset: 2px;
 }
 
-/* Accessibility: Skip link - hidden until focused via keyboard */
+/* Skip link */
 .skip-link {
     position: absolute;
     left: 8px;
@@ -65,7 +65,7 @@
     top: 0;
 }
 
-/* Accessibility: respect users who prefer reduced motion */
+/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -125,12 +125,12 @@ a { color: var(--secondary); }
 
 /* --- Navigation --- */
 nav {
-    /* Keeping the rich dark gradient but adding 95% opacity so it's not washed out */
+    /* Nav background */
     background: linear-gradient(to right, rgba(37, 52, 122, 0.95), rgba(51, 72, 167, 0.95));
-    /* Lighter blur to blend subtly without becoming milky */
+    /* Backdrop blur */
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
-    /* Keeps the nav bar floating near the top of the screen */
+    /* Sticky floating nav */
     position: sticky;
     top: 12px;
     margin: 12px;
@@ -154,8 +154,7 @@ nav {
     color: white;
     display: flex;
     align-items: center;
-    gap: 12px; /* Adds space between the icon and text */
-}
+    gap: 12px;}
 
 .logo-img {
     height: 34px; /* Slightly larger logo */
@@ -230,15 +229,20 @@ nav {
     background-color: var(--dark);
     box-shadow: -2px 0 5px rgba(0,0,0,0.5);
     z-index: 1000;
-    transform: translateX(100%); 
-    transition: transform 0.3s ease-in-out;
+    transform: translateX(100%);
+    /* Hidden when closed: visibility:hidden also removes the off-screen drawer
+       links from the keyboard tab order (and from screen readers), so Tab no
+       longer lands on the hidden mobile menu. */
+    visibility: hidden;
+    transition: transform 0.3s ease-in-out, visibility 0.3s ease-in-out;
     padding-top: 0;
     display: flex;
     flex-direction: column;
 }
 
 .side-menu.active {
-    transform: translateX(0); 
+    transform: translateX(0);
+    visibility: visible;
 }
 
 .side-menu-header {
@@ -344,7 +348,7 @@ label {
     color: var(--secondary);
 }
 
-/* Small helper text under a label/field */
+/* Field hint */
 .field-hint {
     font-size: 0.82rem;
     color: var(--muted);
@@ -402,7 +406,7 @@ input[type="file"]::file-selector-button:hover {
     background: var(--secondary-dark);
 }
 
-/* Live preview thumbnail for uploaded photos */
+/* Image preview */
 .image-preview {
     display: none;
     margin-top: 12px;
@@ -474,8 +478,7 @@ button.btn:active, .btn:active {
 }
 
 .btn-preview {
-    background-color: #5a6b78; /* Darkened for AA contrast with white text */
-}
+    background-color: #5a6b78;}
 .btn-preview:hover,
 .btn-preview:focus-visible {
     background-color: #44525c;
@@ -685,7 +688,7 @@ button.btn:active, .btn:active {
     box-shadow: var(--shadow-lg);
 }
 
-/* Image wrapper enables the badge overlay + hover zoom */
+/* Image wrapper */
 .item-image-wrap {
     position: relative;
     overflow: hidden;
@@ -817,7 +820,7 @@ button.btn:active, .btn:active {
     margin-top: 0.5rem;
 }
 
-/* Claim / inquiry card on the detail page */
+/* Claim card */
 .claim-card {
     background: var(--bg-tint);
     padding: 1.6rem;
@@ -927,17 +930,16 @@ button.btn:active, .btn:active {
 
 .admin-table th:last-child, 
 .admin-table td:last-child {
-    width: 200px; /* Widened slightly to fit fixed buttons */
-    white-space: normal;
+    width: 200px;    white-space: normal;
     overflow: visible;
 }
 
-/* NEW: Bulletproof rule to force exact identical sizes for buttons AND links */
+/* Equal-size buttons and links */
 .admin-table .btn {
     width: 85px !important;
     height: 32px !important; /* Explicitly lock height */
     padding: 0 !important;   /* Remove variable padding */
-    display: inline-flex !important; /* Flexbox ignores differences between <button> and <a> */
+    display: inline-flex !important; /* Normalize button/link box */
     justify-content: center;
     align-items: center;
     font-size: 0.85rem !important;
@@ -952,8 +954,7 @@ footer {
     padding: 2rem 1rem;
     background-color: var(--dark);
     color: white;
-    margin: auto 12px 12px;   /* auto top keeps footer pinned to the bottom */
-    border-radius: 18px;
+    margin: auto 12px 12px;      border-radius: 18px;
     box-shadow: 0 8px 24px rgba(20, 23, 40, 0.18);
 }
 
@@ -1054,7 +1055,7 @@ footer {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-style: normal; /* Keep the X button from being italicized */
+    font-style: normal; /* Close button */
     transition: background var(--transition);
 }
 
@@ -1106,7 +1107,7 @@ footer {
 
 /* --- Mobile Responsiveness --- */
 @media screen and (max-width: 768px) {
-    /* Hide desktop nav, show mobile toggle */
+    /* Mobile nav */
     .desktop-nav {
         display: none; 
     }
@@ -1152,7 +1153,7 @@ footer {
         margin: 10% auto;
     }
 
-    /* Mobile Admin Tables converted to Cards */
+    /* Mobile admin tables */
     .admin-table, .admin-table tbody, .admin-table tr, .admin-table td {
         display: block;
         width: 100%;
@@ -1395,6 +1396,12 @@ footer {
     transition: background var(--transition);
 }
 .side-menu .drawer-links a:hover { background: var(--bg-tint); color: var(--text-color); }
+.side-menu .drawer-links a[aria-current="page"] {
+    background: var(--bg-tint);
+    color: var(--secondary);
+    font-weight: 700;
+    box-shadow: inset 3px 0 0 var(--secondary);
+}
 .drawer-ico { font-size: 1.15rem; width: 24px; text-align: center; }
 
 .drawer-theme {
@@ -1552,7 +1559,7 @@ footer {
 [data-theme="dark"] a { color: #aebfff; }
 [data-theme="dark"] .back-link { color: #aebfff; }
 
-/* Surfaces that were hard-coded light */
+/* Dark-theme surfaces */
 [data-theme="dark"] .modal-content,
 [data-theme="dark"] input[type="text"],
 [data-theme="dark"] input[type="date"],
@@ -1588,7 +1595,7 @@ footer {
 [data-theme="dark"] .flash.success { background: #15321f; color: #b7e7c6; border-color: #205838; }
 [data-theme="dark"] .flash.error { background: #3a1d1d; color: #f3c2c2; border-color: #6b2f2f; }
 
-/* Keep main section underline gradient visible */
+/* Section underline */
 [data-theme="dark"] .section-intro,
 [data-theme="dark"] .field-hint,
 [data-theme="dark"] .meta { color: var(--muted); }
@@ -1602,11 +1609,20 @@ footer {
     .logo-img { height: 28px; }
     .nav-right { gap: 8px; }
 
-    /* Show the animated hamburger, hide desktop-only nav + account */
+    /* Show the animated hamburger; hide the inline nav links (they move into
+       the drawer). The login/account area stays visible in the top bar. */
     .menu-toggle { display: flex; }
     .desktop-nav { display: none; }
 
-    .theme-toggle { width: 38px; height: 38px; }
+    /* Theme toggle in drawer on mobile */
+    .theme-toggle { display: none; }
+
+    /* Compact account controls */
+    .nav-account { gap: 8px; }
+    .nav-account .btn-nav-text { font-size: 0.9rem; }
+    .nav-account .btn-sm { padding: 7px 13px; font-size: 0.86rem; }
+    .account-chip { padding: 4px 10px 4px 4px; max-width: 44vw; }
+    .account-chip > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
     /* Comfortable tap targets everywhere */
     .btn { min-height: 44px; }
@@ -1627,44 +1643,44 @@ footer {
     .back-to-top { right: 14px; bottom: 14px; width: 44px; height: 44px; }
 }
 
-/* Tablet: keep the desktop nav but tighten spacing */
+/* Tablet spacing */
 @media screen and (min-width: 769px) and (max-width: 980px) {
     nav { padding: 0.8rem 1.25rem; }
     .nav-right { gap: 12px; }
     .nav-links { gap: 12px; }
 }
 
-/* Dashboard section heading accen
+/* Dashboard heading */
 /* =====================================================================
    v1.6 — Responsive hardening (works cleanly on any screen size)
    ===================================================================== */
 
-/* Never let media or grids push the page wider than the screen */
+/* Prevent horizontal overflow */
 img, svg, video, canvas { max-width: 100%; }
 html, body { max-width: 100%; }
 
-/* Let the logo shrink (with ellipsis) before the nav controls do */
+/* Logo shrinks first */
 .logo { min-width: 0; flex-shrink: 1; }
 .logo span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .nav-right { flex-shrink: 0; }
 
-/* Wrap instead of overflow on narrow screens */
+/* Wrap on narrow screens */
 .toggle-tabs { flex-wrap: wrap; max-width: 100%; }
 .account-header { flex-wrap: wrap; }
 .share-row { flex-wrap: wrap; }
 .hero-actions { max-width: 100%; }
 
-/* Tablet / small-laptop: ease the grids in a bit sooner */
+/* Tablet grids */
 @media screen and (max-width: 1024px) {
     .item-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
 }
 
 /* Phones & small tablets */
 @media screen and (max-width: 768px) {
-    /* Keep the hero inside the floating layout (no full-bleed clipping) */
+    /* Hero spacing */
     .hero { margin: 0 0 1.5rem; border-radius: var(--radius); }
 
-    /* Stacked detail page: clear the 300px min-widths so nothing overflows */
+    /* Stacked detail page */
     .detail-container > div { min-width: 0 !important; }
 
     /* Two-up stat grids collapse cleanly */
@@ -1699,6 +1715,14 @@ html, body { max-width: 100%; }
     .footer-links a { display: inline-block; margin: 4px 8px; }
 
     .back-to-top { right: 12px; bottom: 12px; width: 42px; height: 42px; }
+}
+
+/* Very small phones: drop the wordmark to the icon so the login/account
+   controls and hamburger always fit on one line. */
+@media screen and (max-width: 360px) {
+    .logo span { display: none; }
+    .nav-right { gap: 5px; }
+    .nav-account { gap: 6px; }
 }
 
 /* Very large screens: keep line lengths comfortable */

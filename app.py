@@ -9,26 +9,23 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 
-# Load variables from a local .env file if python-dotenv is installed.
-# (Optional: the app still runs without it, using your shell environment.)
 try:
     from dotenv import load_dotenv
     load_dotenv()
 except ImportError:
-    pass
+    if os.path.exists('.env') and not os.environ.get('DATABASE_URL'):
+        print("WARNING: python-dotenv is not installed, so your .env was NOT loaded. "
+              "The app is using the local SQLite file, not Supabase. "
+              "Fix it with:  pip install -r requirements.txt")
 
 app = Flask(__name__)
-# Secret key for session management (set SECRET_KEY in .env for production)
 app.secret_key = os.environ.get('SECRET_KEY', 'dev_key_change_this_for_production')
 
 # --- Configuration ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static/uploads')
-DATABASE = os.path.join(BASE_DIR, 'database.db')  # local SQLite fallback
+DATABASE = os.path.join(BASE_DIR, 'database.db')
 
-# If DATABASE_URL is set (e.g. your Supabase connection string), the app uses
-# Postgres. Otherwise it falls back to the local SQLite file, so you can still
-# develop offline exactly as before.
 DATABASE_URL = os.environ.get('DATABASE_URL')
 USE_POSTGRES = bool(DATABASE_URL)
 if USE_POSTGRES:
@@ -37,7 +34,6 @@ if USE_POSTGRES:
 
 
 def _project_ref_from_db_url():
-    """Pull the Supabase project ref out of the pooler username (postgres.<ref>)."""
     if not DATABASE_URL:
         return None
     try:
@@ -50,26 +46,24 @@ def _project_ref_from_db_url():
     return None
 
 
-# --- Supabase Storage (image uploads) ---
-# If a service key is provided, uploaded photos go to a Supabase Storage bucket
-# and we store the public URL. Otherwise we fall back to the local uploads
-# folder, so the app keeps working with no extra setup.
+# --- Supabase Storage ---
 SUPABASE_URL = os.environ.get('SUPABASE_URL')
 if not SUPABASE_URL:
     _ref = _project_ref_from_db_url()
     if _ref:
         SUPABASE_URL = 'https://%s.supabase.co' % _ref
-SUPABASE_SERVICE_KEY = os.environ.get('SUPABASE_SERVICE_KEY')
+SUPABASE_SECRET_KEY = (
+    os.environ.get('SUPABASE_SECRET_KEY')
+    or os.environ.get('SUPABASE_SERVICE_KEY')
+)
 SUPABASE_BUCKET = os.environ.get('SUPABASE_BUCKET', 'item-images')
-STORAGE_ENABLED = bool(SUPABASE_URL and SUPABASE_SERVICE_KEY)
+STORAGE_ENABLED = bool(SUPABASE_URL and SUPABASE_SECRET_KEY)
 
-# Allowed extensions for image uploads
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'avif'}
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# Item categories used across the report form and browse filters.
 CATEGORIES = [
     'Electronics', 'Clothing', 'Bags & Backpacks', 'Water Bottles',
     'Books & Supplies', 'Keys & Wallets', 'Jewelry & Accessories',
@@ -88,11 +82,8 @@ CATEGORY_ICONS = {
     'Other': '\U0001F4E6',
 }
 
+
 # --- Database Connection ---
-# A thin wrapper so the rest of the app uses ONE interface for both backends.
-# SQLite uses "?" placeholders; Postgres uses "%s" — we translate automatically.
-
-
 class _DB:
     def __init__(self, conn, is_postgres):
         self._conn = conn
@@ -119,7 +110,7 @@ def get_db():
             conn = psycopg.connect(DATABASE_URL, row_factory=dict_row)
         else:
             conn = sqlite3.connect(DATABASE)
-            conn.row_factory = sqlite3.Row  # Access columns by name
+            conn.row_factory = sqlite3.Row
         db = g._database = _DB(conn, USE_POSTGRES)
     return db
 
@@ -132,8 +123,6 @@ def close_connection(exception):
 
 
 def _add_column_if_missing(db, table, column_def):
-    """SQLite-only: add a column to an existing table if it isn't there yet,
-    so we can evolve the local schema without dropping data."""
     column_name = column_def.split()[0]
     existing = [row[1] for row in db.execute('PRAGMA table_info(%s)' % table).fetchall()]
     if column_name not in existing:
@@ -141,8 +130,6 @@ def _add_column_if_missing(db, table, column_def):
 
 
 def init_db():
-    """Creates the tables (if missing) and the default admin account, for
-    whichever backend is active."""
     with app.app_context():
         db = get_db()
 
@@ -187,7 +174,6 @@ def init_db():
             """)
             db.commit()
         else:
-            # Local SQLite: original tables + safe column upgrades
             db.execute('''
                 CREATE TABLE IF NOT EXISTS items (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -229,7 +215,6 @@ def init_db():
             db.execute("UPDATE users SET role = 'admin' WHERE role IS NULL")
             db.commit()
 
-        # Create default admin account if none exists (both backends)
         cur = db.execute('SELECT * FROM users WHERE username = ?', ('admin',))
         if cur.fetchone() is None:
             hashed_pw = generate_password_hash('admin123')
@@ -242,8 +227,8 @@ def init_db():
 
         print("Database ready (%s)." % ('Postgres' if USE_POSTGRES else 'SQLite'))
 
-# --- Utilities ---
 
+# --- Utilities ---
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -253,7 +238,6 @@ _bucket_checked = False
 
 
 def _ensure_bucket():
-    """Best-effort: create the public Storage bucket once if it doesn't exist."""
     global _bucket_checked
     if _bucket_checked:
         return
@@ -261,19 +245,19 @@ def _ensure_bucket():
     try:
         body = json.dumps({'id': SUPABASE_BUCKET, 'name': SUPABASE_BUCKET, 'public': True}).encode()
         req = urllib.request.Request('%s/storage/v1/bucket' % SUPABASE_URL, data=body, method='POST')
-        req.add_header('Authorization', 'Bearer %s' % SUPABASE_SERVICE_KEY)
-        req.add_header('apikey', SUPABASE_SERVICE_KEY)
+        req.add_header('Authorization', 'Bearer %s' % SUPABASE_SECRET_KEY)
+        req.add_header('apikey', SUPABASE_SECRET_KEY)
         req.add_header('Content-Type', 'application/json')
         urllib.request.urlopen(req, timeout=15).read()
     except Exception:
-        pass  # already exists or insufficient perms; the upload surfaces real errors
+        pass
 
 
 def _upload_to_supabase(object_name, data, content_type):
     url = '%s/storage/v1/object/%s/%s' % (SUPABASE_URL, SUPABASE_BUCKET, object_name)
     req = urllib.request.Request(url, data=data, method='POST')
-    req.add_header('Authorization', 'Bearer %s' % SUPABASE_SERVICE_KEY)
-    req.add_header('apikey', SUPABASE_SERVICE_KEY)
+    req.add_header('Authorization', 'Bearer %s' % SUPABASE_SECRET_KEY)
+    req.add_header('apikey', SUPABASE_SECRET_KEY)
     req.add_header('Content-Type', content_type or 'application/octet-stream')
     req.add_header('x-upsert', 'true')
     urllib.request.urlopen(req, timeout=20).read()
@@ -281,8 +265,6 @@ def _upload_to_supabase(object_name, data, content_type):
 
 
 def save_upload(file):
-    """Store an uploaded image. Uses Supabase Storage when configured (returns a
-    public URL); otherwise saves to the local uploads folder (returns a filename)."""
     object_name = '%s_%s' % (uuid.uuid4().hex, secure_filename(file.filename))
     data = file.read()
     if STORAGE_ENABLED:
@@ -297,34 +279,32 @@ def save_upload(file):
 
 
 def image_url(value):
-    """Resolve an item's stored image reference to a usable URL. Full URLs
-    (Supabase Storage) are returned as-is; bare filenames map to the local
-    uploads folder (legacy/local items)."""
     if not value:
         return ''
     if value.startswith('http://') or value.startswith('https://'):
         return value
     return url_for('static', filename='uploads/' + value)
 
+
 def current_user():
-    """Returns the logged-in user row, or None for guests."""
     uid = session.get('user_id')
     if not uid:
         return None
     db = get_db()
     return db.execute('SELECT * FROM users WHERE id = ?', (uid,)).fetchone()
 
+
 def is_admin():
     return session.get('role') == 'admin'
 
+
 @app.context_processor
 def inject_globals():
-    """Makes the user and category list available to every template."""
     return dict(current_user=current_user(), CATEGORIES=CATEGORIES, image_url=image_url)
+
 
 @app.template_filter('days_ago')
 def days_ago(value):
-    """Turns a YYYY-MM-DD string into a friendly relative date."""
     try:
         d = datetime.strptime(str(value), '%Y-%m-%d').date()
     except (ValueError, TypeError):
@@ -347,20 +327,21 @@ def days_ago(value):
     years = delta // 365
     return '%d year%s ago' % (years, '' if years == 1 else 's')
 
+
 @app.template_filter('category_icon')
 def category_icon(value):
     return CATEGORY_ICONS.get(value, CATEGORY_ICONS['Other'])
 
-# --- Public Routes ---
 
+# --- Public Routes ---
 @app.route('/')
 def index():
     db = get_db()
-    # Fetch recent approved items for the homepage
     items = db.execute("SELECT * FROM items WHERE status = 'approved' AND report_type = 'found' ORDER BY id DESC LIMIT 3").fetchall()
     found_count = db.execute("SELECT COUNT(*) AS n FROM items WHERE status = 'approved' AND report_type = 'found'").fetchone()['n']
     lost_count = db.execute("SELECT COUNT(*) AS n FROM items WHERE status = 'approved' AND report_type = 'lost'").fetchone()['n']
     return render_template('index.html', items=items, found_count=found_count, lost_count=lost_count)
+
 
 @app.route('/report', methods=('GET', 'POST'))
 def report():
@@ -377,7 +358,6 @@ def report():
         if category not in CATEGORIES:
             category = 'Other'
 
-        # Handle image upload (Supabase Storage if configured, else local folder)
         filename = None
         if 'image' in request.files:
             file = request.files['image']
@@ -395,6 +375,7 @@ def report():
         return redirect(url_for('index'))
 
     return render_template('report.html', current_type=report_type_arg)
+
 
 @app.route('/items')
 def items():
@@ -422,6 +403,7 @@ def items():
         current_category=category, current_sort=sort
     )
 
+
 @app.route('/item/<int:id>', methods=('GET', 'POST'))
 def item_detail(id):
     db = get_db()
@@ -431,7 +413,6 @@ def item_detail(id):
         flash('Item not found.', 'error')
         return redirect(url_for('items'))
 
-    # Handle claim submission
     if request.method == 'POST':
         claimer_name = request.form['claimer_name']
         claimer_contact = request.form['claimer_contact']
@@ -446,22 +427,24 @@ def item_detail(id):
 
     return render_template('item_detail.html', item=item)
 
-# --- Static Pages ---
 
+# --- Static Pages ---
 @app.route('/contact')
 def contact():
     return render_template('contact.html')
+
 
 @app.route('/legal')
 def legal():
     return render_template('legal.html')
 
+
 @app.route('/sources')
 def sources():
     return render_template('sources.html')
 
-# --- Student Accounts ---
 
+# --- Student Accounts ---
 @app.route('/register', methods=('GET', 'POST'))
 def register():
     if current_user():
@@ -494,6 +477,7 @@ def register():
             return redirect(url_for('account'))
     return render_template('register.html')
 
+
 @app.route('/account', methods=('GET', 'POST'))
 def account():
     user = current_user()
@@ -517,8 +501,8 @@ def account():
     my_claims = db.execute('SELECT * FROM claims WHERE user_id = ? ORDER BY id DESC', (user['id'],)).fetchall()
     return render_template('account.html', user=user, my_items=my_items, my_claims=my_claims)
 
-# --- Auth ---
 
+# --- Auth ---
 @app.route('/login', methods=('GET', 'POST'))
 def login():
     if request.method == 'POST':
@@ -541,13 +525,14 @@ def login():
 
     return render_template('login.html')
 
+
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('index'))
 
-# --- Admin Routes ---
 
+# --- Admin Routes ---
 @app.route('/dashboard')
 def dashboard():
     if not is_admin():
@@ -562,6 +547,7 @@ def dashboard():
 
     return render_template('dashboard.html', pending_found=pending_found, pending_lost=pending_lost, live_found=live_found, active_lost=active_lost, claims=claims)
 
+
 @app.route('/approve/<int:id>')
 def approve(id):
     if not is_admin():
@@ -572,17 +558,18 @@ def approve(id):
     flash('Item approved.', 'success')
     return redirect(url_for('dashboard'))
 
+
 @app.route('/delete/<int:id>')
 def delete(id):
     if not is_admin():
         return redirect(url_for('login'))
     db = get_db()
-    # Delete item and associated claims
     db.execute('DELETE FROM items WHERE id = ?', (id,))
     db.execute('DELETE FROM claims WHERE item_id = ?', (id,))
     db.commit()
     flash('Item removed.', 'success')
     return redirect(url_for('dashboard'))
+
 
 @app.route('/delete_claim/<int:id>')
 def delete_claim(id):
@@ -593,6 +580,7 @@ def delete_claim(id):
     db.commit()
     flash('Claim dismissed.', 'success')
     return redirect(url_for('dashboard'))
+
 
 init_db()
 

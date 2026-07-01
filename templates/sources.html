@@ -13,7 +13,10 @@
             <li><strong>Python (v3.10+)</strong>: Backend programming logic. Documented at <a href="https://docs.python.org/3/" target="_blank" rel="noopener">docs.python.org</a>.</li>
             <li><strong>Flask (v3.0.0)</strong>: Python web framework used for routing and rendering templates. Documented at <a href="https://flask.palletsprojects.com/" target="_blank" rel="noopener">flask.palletsprojects.com</a>.</li>
             <li><strong>Jinja2</strong>: Templating engine used to build pages from a shared base layout. Documented at <a href="https://jinja.palletsprojects.com/" target="_blank" rel="noopener">jinja.palletsprojects.com</a>.</li>
-            <li><strong>SQLite3</strong>: Built-in Python library for database management. Used for persistent storage of items, claims, and users. See <a href="https://www.sqlite.org/docs.html" target="_blank" rel="noopener">sqlite.org</a>.</li>
+            <li><strong>Supabase (hosted PostgreSQL)</strong>: Cloud database service used for persistent storage of items, claims, and user accounts, and for storing uploaded item photos in Supabase Storage. See <a href="https://supabase.com/docs" target="_blank" rel="noopener">supabase.com/docs</a> and <a href="https://www.postgresql.org/docs/" target="_blank" rel="noopener">postgresql.org/docs</a>.</li>
+            <li><strong>psycopg (v3)</strong>: PostgreSQL database adapter for Python, used to connect the app to Supabase. See <a href="https://www.psycopg.org/psycopg3/docs/" target="_blank" rel="noopener">psycopg.org</a>.</li>
+            <li><strong>SQLite3</strong>: Built-in Python library used as the local offline-development database fallback when no cloud connection is configured. See <a href="https://www.sqlite.org/docs.html" target="_blank" rel="noopener">sqlite.org</a>.</li>
+            <li><strong>python-dotenv</strong>: Loads database credentials and secret keys from a local <code>.env</code> file so they are never hard-coded. See <a href="https://pypi.org/project/python-dotenv/" target="_blank" rel="noopener">pypi.org/project/python-dotenv</a>.</li>
             <li><strong>Werkzeug</strong>: WSGI utility library, used specifically for secure password hashing (<code>generate_password_hash</code>) and safe file-name handling on uploads (<code>secure_filename</code>). See <a href="https://werkzeug.palletsprojects.com/" target="_blank" rel="noopener">werkzeug.palletsprojects.com</a>.</li>
         </ul>
     </section>
@@ -32,6 +35,16 @@
             <li><strong>W3C Web Content Accessibility Guidelines (WCAG 2.1 AA)</strong>: Site built with semantic HTML (<code>&lt;nav&gt;</code>, <code>&lt;main&gt;</code>, <code>&lt;header&gt;</code>, <code>&lt;footer&gt;</code>), ARIA labels, a skip-to-content link, keyboard-operable menus and dialogs, and AA-level color contrast. See <a href="https://www.w3.org/WAI/standards-guidelines/wcag/" target="_blank" rel="noopener">w3.org/WAI</a>.</li>
             <li><strong>WAI-ARIA Authoring Practices</strong>: Used to guide the accessible dialog (modal) and navigation patterns. See <a href="https://www.w3.org/WAI/ARIA/apg/" target="_blank" rel="noopener">w3.org/WAI/ARIA/apg</a>.</li>
             <li><strong>Responsive CSS</strong>: Layout managed entirely through CSS Flexbox, CSS Grid, and media queries &mdash; no external UI libraries such as Bootstrap.</li>
+        </ul>
+    </section>
+
+    <section style="margin-bottom: 2rem;">
+        <h3 style="color: var(--primary);">Media &amp; Image Credits</h3>
+        <ul style="margin-left: 20px; margin-top: 10px; line-height: 1.8;">
+            <li><strong>Item photographs (stock libraries)</strong>: Several example item photos are royalty-free stock images sourced from free stock-photo libraries, used under their respective free-use licenses: <a href="https://unsplash.com/license" target="_blank" rel="noopener">Unsplash</a>, <a href="https://www.pexels.com/license/" target="_blank" rel="noopener">Pexels</a>, and <a href="https://pixabay.com/service/license-summary/" target="_blank" rel="noopener">Pixabay</a>.</li>
+            <li><strong>Item photographs (Wikimedia Commons)</strong>: Other item photos are hosted on Wikimedia Commons and used under their respective Creative Commons licenses (see each file page for the specific license and author): <a href="https://commons.wikimedia.org/wiki/File:Apple_Watch_Series_4_40mm_space_gray_Aluminum.jpg" target="_blank" rel="noopener">Apple Watch</a>, <a href="https://commons.wikimedia.org/wiki/File:Apple_airpods_pro_case.jpg" target="_blank" rel="noopener">AirPods Pro case</a>, <a href="https://commons.wikimedia.org/wiki/File:HydroFlask_Insulated_Bottle_(29133242351).jpg" target="_blank" rel="noopener">Hydro Flask</a>, <a href="https://commons.wikimedia.org/wiki/File:Horn-rimmed_and_browline_glasses.JPG" target="_blank" rel="noopener">eyeglasses</a>, and <a href="https://commons.wikimedia.org/wiki/File:Keychain.jpg" target="_blank" rel="noopener">keys</a>. Product names refer to real items only for identification; no trademark affiliation is implied.</li>
+            <li><strong>School logo &amp; site icon</strong>: The Seven Lakes High School logo and site icon are property of Seven Lakes High School / Katy ISD and are used for this educational project only.</li>
+            <li><strong>Emoji &amp; symbols</strong>: Category and interface icons use standard Unicode emoji characters rendered by the user's own device/browser; no third-party icon library is bundled.</li>
         </ul>
     </section>
 
